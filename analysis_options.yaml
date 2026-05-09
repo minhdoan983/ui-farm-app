@@ -1,0 +1,60 @@
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.gr.dart"
+    - "**/*.freezed.dart"
+    - "**/*.config.dart"
+    - "**/*.gen.dart"
+    - "**/generated/**"
+    - "packages/bricks/**"
+  errors:
+    unused_import: warning
+    invalid_annotation_target: ignore
+
+formatter:
+  page_width: 100
+
+# https://dart.dev/tools/linter-rules
+linter:
+  rules:
+    always_declare_return_types: true
+    avoid_multiple_declarations_per_line: true
+    avoid_redundant_argument_values: true
+    avoid_types_on_closure_parameters: true
+    avoid_void_async: true
+    cancel_subscriptions: true
+    close_sinks: true
+    dangling_library_doc_comments: false
+    directives_ordering: true
+    eol_at_end_of_file: true
+    no_adjacent_strings_in_list: true
+    no_literal_bool_comparisons: true
+    no_self_assignments: true
+    only_throw_errors: true
+    parameter_assignments: true
+    prefer_asserts_in_initializer_lists: true
+    prefer_const_constructors: true
+    prefer_const_declarations: true
+    prefer_const_literals_to_create_immutables: true
+    prefer_final_locals: true
+    prefer_null_aware_method_calls: true
+    prefer_single_quotes: true
+    prefer_void_to_null: true
+    require_trailing_commas: true
+    sized_box_shrink_expand: true
+    sort_constructors_first: true
+    unnecessary_async: true
+    unnecessary_breaks: true
+    unnecessary_lambdas: true
+    unnecessary_null_checks: true
+    unnecessary_parenthesis: true
+    unnecessary_unawaited: true
+    unreachable_from_main: true
+    use_enums: true
+    use_is_even_rather_than_modulo: true
+    use_named_constants: true
+    use_string_buffers: true
+    use_to_and_as_if_applicable: true
+    use_truncating_division: true
