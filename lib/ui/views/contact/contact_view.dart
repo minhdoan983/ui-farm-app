@@ -27,10 +27,7 @@ class ContactView extends StatelessWidget {
               child: Container(
                 width: 180,
                 height: 180,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFF1D8C2),
-                  shape: BoxShape.circle,
-                ),
+                decoration: const BoxDecoration(color: Color(0xFFF1D8C2), shape: BoxShape.circle),
               ),
             ),
             Positioned(
@@ -39,10 +36,7 @@ class ContactView extends StatelessWidget {
               child: Container(
                 width: 200,
                 height: 200,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFEAD1BB),
-                  shape: BoxShape.circle,
-                ),
+                decoration: const BoxDecoration(color: Color(0xFFEAD1BB), shape: BoxShape.circle),
               ),
             ),
             SingleChildScrollView(
@@ -64,10 +58,10 @@ class ContactView extends StatelessWidget {
                         child: Assets.images.logoPng.image(),
                       ),
                       const SizedBox(width: 12),
-                      const Expanded(
+                      Expanded(
                         child: Text(
-                          'Contact with UI Farm',
-                          style: TextStyle(
+                          S.current.contactTitle,
+                          style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                             color: Colors.brown,
@@ -93,9 +87,7 @@ class ContactView extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         ClipRRect(
-                          borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(18),
-                          ),
+                          borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
                           child: Assets.images.banner.image(
                             height: 220,
                             width: double.infinity,
@@ -107,32 +99,27 @@ class ContactView extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
-                                'Contact with UI Farm',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
-                                ),
+                              Text(
+                                S.current.contactTitle,
+                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
                               ),
                               const SizedBox(height: 8),
-                              const Text(
-                                'Đặt may áo dài tại FB: UI Farm hoặc IG: @uifarm_2020. '
-                                'Bạn có thể đặt online hoặc tới trực tiếp studio của UI để được tư vấn. '
-                                'Chuẩn bị may ra tà áo đẹp nhất VN.',
-                                style: TextStyle(color: Color(0xFF6B6B6B)),
+                              Text(
+                                S.current.contactDescription,
+                                style: const TextStyle(color: Color(0xFF6B6B6B)),
                               ),
                               const SizedBox(height: 12),
                               Wrap(
                                 spacing: 8,
                                 runSpacing: 8,
-                                children: const [
-                                  _TagChip(text: '#uifarm'),
-                                  _TagChip(text: '#aodai'),
-                                  _TagChip(text: '#aodaivietnam'),
-                                  _TagChip(text: '#vietnam'),
-                                  _TagChip(text: '#linen'),
-                                  _TagChip(text: '#muongxanh'),
-                                  _TagChip(text: '#silk'),
+                                children: [
+                                  _TagChip(text: S.current.contactTagUifarm),
+                                  _TagChip(text: S.current.contactTagAodai),
+                                  _TagChip(text: S.current.contactTagAodaiVn),
+                                  _TagChip(text: S.current.contactTagVietnam),
+                                  _TagChip(text: S.current.contactTagLinen),
+                                  _TagChip(text: S.current.contactTagMuongXanh),
+                                  _TagChip(text: S.current.contactTagSilk),
                                 ],
                               ),
                             ],
@@ -147,7 +134,7 @@ class ContactView extends StatelessWidget {
                       Expanded(
                         child: _SocialButton(
                           icon: Icons.facebook,
-                          label: 'Facebook',
+                          label: S.current.contactFacebook,
                           onTap: () => _openUrl('https://facebook.com'),
                         ),
                       ),
@@ -155,7 +142,7 @@ class ContactView extends StatelessWidget {
                       Expanded(
                         child: _SocialButton(
                           icon: Icons.camera_alt_rounded,
-                          label: 'Instagram',
+                          label: S.current.contactInstagram,
                           onTap: () => _openUrl('https://instagram.com'),
                         ),
                       ),
@@ -187,22 +174,14 @@ class _TagChip extends StatelessWidget {
       ),
       child: Text(
         text,
-        style: const TextStyle(
-          color: Colors.brown,
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-        ),
+        style: const TextStyle(color: Colors.brown, fontSize: 12, fontWeight: FontWeight.w600),
       ),
     );
   }
 }
 
 class _SocialButton extends StatelessWidget {
-  const _SocialButton({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-  });
+  const _SocialButton({required this.icon, required this.label, required this.onTap});
 
   final IconData icon;
   final String label;
@@ -234,10 +213,7 @@ class _SocialButton extends StatelessWidget {
             const SizedBox(width: 8),
             Text(
               label,
-              style: const TextStyle(
-                color: Colors.brown,
-                fontWeight: FontWeight.w600,
-              ),
+              style: const TextStyle(color: Colors.brown, fontWeight: FontWeight.w600),
             ),
           ],
         ),

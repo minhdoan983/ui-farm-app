@@ -1,7 +1,8 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:ui_farm/core/bottom_bar_notifier.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ui_farm/core/core.dart';
 import 'package:ui_farm/resources/resources.dart';
 import 'package:ui_farm/ui/ui.dart';
 
@@ -34,10 +35,7 @@ class _MainViewState extends State<MainView> {
       notifier: _bottomBarNotifier,
       child: AutoTabsScaffold(
         routes: const [BottomTabHomeRouter(), ProfileRoute(), ListItemRoute()],
-        drawer: Drawer(
-          width: MediaQuery.sizeOf(context).width,
-          child: const _MainDrawer(selectedLabel: 'Trang chủ'),
-        ),
+        drawer: Drawer(width: MediaQuery.sizeOf(context).width, child: const _MainDrawer()),
         appBarBuilder: (context, tabsRouter) {
           return AppBar(
             centerTitle: true,
@@ -49,39 +47,65 @@ class _MainViewState extends State<MainView> {
               builder: (context) {
                 return IconButton(
                   onPressed: () => Scaffold.of(context).openDrawer(),
-                  icon: const Icon(
-                    Icons.menu_rounded,
-                    size: 30,
-                    color: Colors.brown,
-                  ),
+                  icon: const Icon(Icons.menu_rounded, size: 30, color: Colors.brown),
                 );
               },
             ),
-            title: const Center(
+            title: Center(
               child: Text(
-                "UI Farm",
-                style: TextStyle(
-                  color: Colors.brown,
-                  fontWeight: FontWeight.bold,
-                ),
+                S.current.appTitle,
+                style: const TextStyle(color: Colors.brown, fontWeight: FontWeight.bold),
               ),
             ),
             actions: [
-              GestureDetector(
-                onTap: () => context.router.push(const CartRoute()),
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(50),
-                    border: Border.all(color: Colors.brown, width: 2),
-                  ),
-                  child: const Icon(
-                    Icons.shopping_bag_outlined,
-                    size: 30,
-                    color: Colors.brown,
-                  ),
-                ),
+              BlocBuilder<AppBloc, AppState>(
+                buildWhen: (p, c) => p.cart.cartItems.length != c.cart.cartItems.length,
+                builder: (context, state) {
+                  final count = state.cart.cartItems.length;
+                  return GestureDetector(
+                    onTap: () => context.router.push(const CartRoute()),
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(50),
+                            border: Border.all(color: Colors.brown, width: 2),
+                          ),
+                          child: const Icon(
+                            Icons.shopping_bag_outlined,
+                            size: 30,
+                            color: Colors.brown,
+                          ),
+                        ),
+                        if (count > 0)
+                          Positioned(
+                            top: -6,
+                            right: -6,
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: const BoxDecoration(
+                                color: Colors.red,
+                                shape: BoxShape.circle,
+                              ),
+                              constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
+                              child: Text(
+                                count > 99 ? S.current.cartBadge99 : '$count',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  );
+                },
               ),
             ],
           );
@@ -99,28 +123,26 @@ class _MainViewState extends State<MainView> {
                         currentIndex: tabsRouter.activeIndex,
                         onTap: (value) {
                           if (tabsRouter.activeIndex == value) {
-                            tabsRouter
-                                .stackRouterOfIndex(value)
-                                ?.popUntilRoot();
+                            tabsRouter.stackRouterOfIndex(value)?.popUntilRoot();
                           } else {
                             tabsRouter.setActiveIndex(value);
                           }
                         },
-                        items: const [
+                        items: [
                           BottomNavigationBarItem(
-                            icon: Icon(CupertinoIcons.house),
-                            activeIcon: Icon(CupertinoIcons.house_fill),
-                            label: 'Home',
+                            icon: const Icon(CupertinoIcons.house),
+                            activeIcon: const Icon(CupertinoIcons.house_fill),
+                            label: S.current.bottomHome,
                           ),
                           BottomNavigationBarItem(
-                            icon: Icon(CupertinoIcons.person),
-                            activeIcon: Icon(CupertinoIcons.person_solid),
-                            label: 'Profile',
+                            icon: const Icon(CupertinoIcons.person),
+                            activeIcon: const Icon(CupertinoIcons.person_solid),
+                            label: S.current.bottomProfile,
                           ),
                           BottomNavigationBarItem(
-                            icon: Icon(CupertinoIcons.shopping_cart),
-                            activeIcon: Icon(CupertinoIcons.cart_fill),
-                            label: 'Shop',
+                            icon: const Icon(CupertinoIcons.shopping_cart),
+                            activeIcon: const Icon(CupertinoIcons.cart_fill),
+                            label: S.current.bottomStore,
                           ),
                         ],
                       )
@@ -135,15 +157,40 @@ class _MainViewState extends State<MainView> {
 }
 
 class _MainDrawer extends StatelessWidget {
-  const _MainDrawer({required this.selectedLabel});
+  const _MainDrawer();
 
   static const _bgColor = Color(0xFFFFF7EF);
   static const _accent = Colors.brown;
-  final String selectedLabel;
+
+  String _selectedLabel(BuildContext context) {
+    final tabsRouter = AutoTabsRouter.of(context);
+    final rootCurrent = context.router.current.name;
+    final tabCurrent = tabsRouter.stackRouterOfIndex(tabsRouter.activeIndex)?.current.name;
+
+    if (rootCurrent == OrderManagementRoute.name) {
+      return S.current.drawerOrderManagement;
+    }
+    if (rootCurrent == ItemManagementRoute.name) {
+      return S.current.drawerProductManagement;
+    }
+    if (tabCurrent == ContactRoute.name) {
+      return S.current.drawerContact;
+    }
+
+    switch (tabsRouter.activeIndex) {
+      case 1:
+        return S.current.drawerProfileInfo;
+      case 2:
+        return S.current.drawerProducts;
+      default:
+        return S.current.drawerHome;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     void closeDrawer() => Navigator.pop(context);
+    final selectedLabel = _selectedLabel(context);
 
     return SafeArea(
       child: Container(
@@ -165,9 +212,9 @@ class _MainDrawer extends StatelessWidget {
                     child: Assets.images.logoPng.image(),
                   ),
                   const SizedBox(width: 12),
-                  const Text(
-                    'UI Farm',
-                    style: TextStyle(
+                  Text(
+                    S.current.appTitle,
+                    style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                       color: _accent,
@@ -182,8 +229,8 @@ class _MainDrawer extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 children: [
                   _DrawerItem(
-                    label: 'Trang chủ',
-                    isSelected: selectedLabel == 'Trang chủ',
+                    label: S.current.drawerHome,
+                    isSelected: selectedLabel == S.current.drawerHome,
                     onTap: () {
                       Navigator.pop(context);
                       final tabsRouter = AutoTabsRouter.of(context);
@@ -192,8 +239,8 @@ class _MainDrawer extends StatelessWidget {
                     },
                   ),
                   _DrawerItem(
-                    label: 'Sản phẩm',
-                    isSelected: selectedLabel == 'Sản phẩm',
+                    label: S.current.drawerProducts,
+                    isSelected: selectedLabel == S.current.drawerProducts,
                     onTap: () {
                       Navigator.pop(context);
                       context.router.popUntilRoot();
@@ -201,8 +248,8 @@ class _MainDrawer extends StatelessWidget {
                     },
                   ),
                   _DrawerItem(
-                    label: 'Cửa hàng',
-                    isSelected: selectedLabel == 'Cửa hàng',
+                    label: S.current.drawerStore,
+                    isSelected: selectedLabel == S.current.drawerStore,
                     onTap: () {
                       Navigator.pop(context);
                       context.router.popUntilRoot();
@@ -210,8 +257,8 @@ class _MainDrawer extends StatelessWidget {
                     },
                   ),
                   _DrawerItem(
-                    label: 'Liên hệ',
-                    isSelected: selectedLabel == 'Liên hệ',
+                    label: S.current.drawerContact,
+                    isSelected: selectedLabel == S.current.drawerContact,
                     onTap: () {
                       Navigator.pop(context);
                       AutoTabsRouter.of(context).setActiveIndex(0);
@@ -220,39 +267,45 @@ class _MainDrawer extends StatelessWidget {
                   ),
                   const _DrawerSectionDivider(),
                   _DrawerItem(
-                    label: 'Quản lý đơn hàng',
-                    isSelected: selectedLabel == 'Quản lý đơn hàng',
+                    label: S.current.drawerOrderManagement,
+                    isSelected: selectedLabel == S.current.drawerOrderManagement,
                     onTap: () {
                       final tabsRouter = AutoTabsRouter.of(context);
                       Navigator.pop(context);
                       WidgetsBinding.instance.addPostFrameCallback((_) {
-                        tabsRouter.setActiveIndex(1); // index của Profile tab
+                        tabsRouter.setActiveIndex(1);
                         context.router.push(const OrderManagementRoute());
                       });
                     },
                   ),
                   _DrawerItem(
-                    label: 'Quản lý sản phẩm',
-                    isSelected: selectedLabel == 'Quản lý sản phẩm',
+                    label: S.current.drawerProductManagement,
+                    isSelected: selectedLabel == S.current.drawerProductManagement,
                     onTap: () {
                       final tabsRouter = AutoTabsRouter.of(context);
                       Navigator.pop(context);
                       WidgetsBinding.instance.addPostFrameCallback((_) {
-                        tabsRouter.setActiveIndex(2); // index của Shop tab
+                        tabsRouter.setActiveIndex(2);
                         context.router.push(const ItemManagementRoute());
                       });
                     },
                   ),
                   _DrawerItem(
-                    label: 'Thông tin cá nhân',
-                    isSelected: selectedLabel == 'Thông tin cá nhân',
-                    onTap: closeDrawer,
+                    label: S.current.drawerProfileInfo,
+                    isSelected: selectedLabel == S.current.drawerProfileInfo,
+                    onTap: () {
+                      final tabsRouter = AutoTabsRouter.of(context);
+                      Navigator.pop(context);
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        tabsRouter.setActiveIndex(1);
+                      });
+                    },
                   ),
                   _DrawerItem(
-                    label: 'Đăng xuất',
-                    isDestructive: true,
-                    isSelected: selectedLabel == 'Đăng xuất',
+                    label: S.current.drawerLogout,
+                    isSelected: selectedLabel == S.current.drawerLogout,
                     onTap: closeDrawer,
+                    isDestructive: true,
                   ),
                 ],
               ),
@@ -269,10 +322,7 @@ class _DrawerSectionDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.symmetric(vertical: 8),
-      child: Divider(height: 1),
-    );
+    return const Padding(padding: EdgeInsets.symmetric(vertical: 8), child: Divider(height: 1));
   }
 }
 
@@ -291,9 +341,7 @@ class _DrawerItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isSelected
-        ? Colors.white
-        : (isDestructive ? Colors.red : Colors.brown);
+    final color = isSelected ? Colors.white : (isDestructive ? Colors.red : Colors.brown);
     final background = isSelected ? Colors.brown : Colors.white;
     final borderColor = isSelected ? Colors.brown : const Color(0xFFE4D8CC);
 

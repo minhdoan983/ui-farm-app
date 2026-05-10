@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ui_farm/resources/resources.dart';
+import 'package:ui_farm/ui/ui.dart';
 
 @RoutePage()
 class ProfileView extends StatefulWidget {
@@ -11,180 +15,206 @@ class ProfileView extends StatefulWidget {
   State<ProfileView> createState() => _ProfileViewState();
 }
 
-class _ProfileViewState extends State<ProfileView> {
+class _ProfileViewState extends BasePageState<ProfileView, ProfileBloc> {
+  late final TextEditingController _nameController;
+  late final TextEditingController _phoneController;
+
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 18).copyWith(top: 100),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Stack(
-                children: [
-                  ClipOval(
-                    child: SizedBox(
-                      width: 200,
-                      height: 200,
-                      child: Assets.images.logoJpg.image(fit: BoxFit.cover),
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController();
+    _phoneController = TextEditingController();
+    bloc.add(const ProfileViewInitiated());
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _phoneController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget buildPage(BuildContext context) {
+    return BlocConsumer<ProfileBloc, ProfileState>(
+      listenWhen: (previous, current) {
+        return previous.isSaveSuccess != current.isSaveSuccess ||
+            previous.errorMessage != current.errorMessage;
+      },
+      listener: (context, state) {
+        if (state.isSaveSuccess) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(S.current.profileUpdateSuccess), backgroundColor: Colors.brown),
+          );
+        }
+        if (state.errorMessage.isNotEmpty) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.errorMessage), backgroundColor: Colors.red));
+        }
+      },
+      buildWhen: (previous, current) {
+        return previous.name != current.name ||
+            previous.phone != current.phone ||
+            previous.email != current.email ||
+            previous.avatarUrl != current.avatarUrl ||
+            previous.isLoading != current.isLoading;
+      },
+      builder: (context, state) {
+        if (_nameController.text != state.name) {
+          _nameController.text = state.name;
+        }
+        if (_phoneController.text != state.phone) {
+          _phoneController.text = state.phone;
+        }
+
+        return Scaffold(
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 18).copyWith(top: 100),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Stack(
+                    children: [
+                      ClipOval(
+                        child: SizedBox(
+                          width: 200,
+                          height: 200,
+                          child: BlocBuilder<ProfileBloc, ProfileState>(
+                            buildWhen: (previous, current) {
+                              return previous.pickedImage != current.pickedImage ||
+                                  previous.avatarUrl != current.avatarUrl;
+                            },
+                            builder: (context, state) {
+                              if (state.pickedImage != null) {
+                                return Image.file(File(state.pickedImage!.path), fit: BoxFit.cover);
+                              }
+                              if (state.avatarUrl.isNotEmpty) {
+                                return Image.network(
+                                  state.avatarUrl,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (_, __, ___) =>
+                                      Assets.images.logoJpg.image(fit: BoxFit.cover),
+                                );
+                              }
+
+                              return Assets.images.logoJpg.image(fit: BoxFit.cover);
+                            },
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        right: 40,
+                        child: GestureDetector(
+                          onTap: () => bloc.add(const ProfileAvatarPickPressed()),
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              color: Colors.brown,
+                              borderRadius: BorderRadius.circular(50),
+                            ),
+                            child: const Icon(CupertinoIcons.pencil_outline, color: Colors.white),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Center(
+                  child: Text(
+                    state.name.isNotEmpty ? state.name : S.current.profileDefaultName,
+                    style: const TextStyle(fontSize: 20),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Text(S.current.profileNameLabel),
+                const SizedBox(height: 10),
+                DashedRRectBorder(
+                  child: TextField(
+                    controller: _nameController,
+                    decoration: const InputDecoration(
+                      prefixIcon: Icon(CupertinoIcons.person),
+                      border: InputBorder.none,
+                    ),
+                    onChanged: (v) => bloc.add(ProfileNameTextFieldChanged(name: v)),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Text(S.current.profileEmailLabel),
+                const SizedBox(height: 10),
+                DashedRRectBorder(
+                  padding: EdgeInsets.zero,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF5F2EE),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: TextField(
+                      controller: TextEditingController(text: state.email),
+                      readOnly: true,
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        prefixIcon: Icon(CupertinoIcons.mail),
+                      ),
                     ),
                   ),
-                  Positioned(
-                    bottom: 0,
-                    right: 40,
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: Colors.brown,
-                        borderRadius: BorderRadius.circular(50),
-                      ),
-                      child: const Icon(
-                        CupertinoIcons.pencil_outline,
-                        color: Colors.white,
-                      ),
+                ),
+                const SizedBox(height: 10),
+                Text(S.current.profilePhoneLabel),
+                const SizedBox(height: 10),
+                DashedRRectBorder(
+                  child: TextField(
+                    controller: _phoneController,
+                    keyboardType: TextInputType.phone,
+                    decoration: const InputDecoration(
+                      prefixIcon: Icon(CupertinoIcons.phone),
+                      border: InputBorder.none,
+                    ),
+                    onChanged: (v) => bloc.add(ProfilePhoneTextFieldChanged(phone: v)),
+                  ),
+                ),
+                const SizedBox(height: 30),
+                if (state.errorMessage.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: Text(
+                      state.errorMessage,
+                      style: const TextStyle(color: Colors.red, fontSize: 13),
                     ),
                   ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 10),
-            const Center(
-              child: Text("UI Farm", style: TextStyle(fontSize: 20)),
-            ),
-            const SizedBox(height: 10),
-            const Text('Name'),
-            const SizedBox(height: 10),
-            const DashedRRectBorder(
-              child: TextField(
-                decoration: InputDecoration(
-                  prefixIcon: Icon(CupertinoIcons.person),
-                  hint: Text('Nguyen Van A'),
-                  border: InputBorder.none,
-                ),
-              ),
-            ),
-            const SizedBox(height: 10),
-            const Text('Your Email'),
-            const SizedBox(height: 10),
-            DashedRRectBorder(
-              padding: EdgeInsets.zero,
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF5F2EE),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const TextField(
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    prefixIcon: Icon(CupertinoIcons.mail),
-                    hintText: 'abc@gmail.com',
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: state.isLoading
+                        ? null
+                        : () => bloc.add(const ProfileSaveButtonPressed()),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.brown,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    child: state.isLoading
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                          )
+                        : Text(
+                            S.current.profileSaveButton,
+                            style: const TextStyle(color: Colors.white),
+                          ),
                   ),
                 ),
-              ),
+                const SizedBox(height: 30),
+              ],
             ),
-            const SizedBox(height: 10),
-            const Text('Phone Number'),
-            const SizedBox(height: 10),
-            const DashedRRectBorder(
-              child: TextField(
-                decoration: InputDecoration(
-                  prefixIcon: Icon(CupertinoIcons.phone),
-                  hint: Text('0123456789'),
-                  border: InputBorder.none,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
-  }
-}
-
-class DashedRRectBorder extends StatelessWidget {
-  const DashedRRectBorder({
-    super.key,
-    required this.child,
-    this.radius = 12,
-    this.strokeWidth = 1.5,
-    this.dashWidth = 6,
-    this.dashGap = 4,
-    this.color = Colors.black,
-    this.padding = const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-  });
-
-  final Widget child;
-  final double radius;
-  final double strokeWidth;
-  final double dashWidth;
-  final double dashGap;
-  final Color color;
-  final EdgeInsets padding;
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomPaint(
-      painter: _DashedRRectPainter(
-        radius: radius,
-        strokeWidth: strokeWidth,
-        dashWidth: dashWidth,
-        dashGap: dashGap,
-        color: color,
-      ),
-      child: Padding(padding: padding, child: child),
-    );
-  }
-}
-
-class _DashedRRectPainter extends CustomPainter {
-  _DashedRRectPainter({
-    required this.radius,
-    required this.strokeWidth,
-    required this.dashWidth,
-    required this.dashGap,
-    required this.color,
-  });
-
-  final double radius;
-  final double strokeWidth;
-  final double dashWidth;
-  final double dashGap;
-  final Color color;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = strokeWidth;
-
-    final rrect = RRect.fromRectAndRadius(
-      Offset.zero & size,
-      Radius.circular(radius),
-    );
-
-    final path = Path()..addRRect(rrect);
-    for (final metric in path.computeMetrics()) {
-      double distance = 0;
-      while (distance < metric.length) {
-        final len = dashWidth;
-        canvas.drawPath(metric.extractPath(distance, distance + len), paint);
-        distance += dashWidth + dashGap;
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _DashedRRectPainter oldDelegate) {
-    return oldDelegate.radius != radius ||
-        oldDelegate.strokeWidth != strokeWidth ||
-        oldDelegate.dashWidth != dashWidth ||
-        oldDelegate.dashGap != dashGap ||
-        oldDelegate.color != color;
   }
 }

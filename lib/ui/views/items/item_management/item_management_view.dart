@@ -18,13 +18,7 @@ class _ItemManagementViewState extends State<ItemManagementView> {
   final _priceCtrl = TextEditingController();
   final _galleryCtrl = TextEditingController();
 
-  final _colors = [
-    Colors.red,
-    Colors.black,
-    Colors.white,
-    Colors.brown,
-    Colors.green,
-  ];
+  final _colors = [Colors.red, Colors.black, Colors.white, Colors.brown, Colors.green];
   final _materials = ['Linen bột', 'Lụa tơ', 'Đũi thô', 'Tuyết mai'];
   final _galleries = ['BST Xuân 2024', 'BST Tết', 'BST Cưới'];
 
@@ -44,61 +38,46 @@ class _ItemManagementViewState extends State<ItemManagementView> {
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
         leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios_new_rounded,
-            color: Colors.brown,
-          ),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.brown),
           onPressed: () => context.router.pop(),
         ),
         title: const Text(
           'Quản lý sản phẩm',
-          style: TextStyle(
-            color: Color(0xFF6B3A1F),
-            fontWeight: FontWeight.w600,
-            fontSize: 16,
-          ),
+          style: TextStyle(color: Color(0xFF6B3A1F), fontWeight: FontWeight.w600, fontSize: 16),
         ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(52),
           child: Padding(
             padding: const EdgeInsets.fromLTRB(14, 0, 14, 10),
             child: Row(
-              children: ['Tạo mới', 'Chỉnh sửa', 'Thư viện']
-                  .asMap()
-                  .entries
-                  .map((e) {
-                    final selected = _tabIndex == e.key;
-                    return Expanded(
-                      child: GestureDetector(
-                        onTap: () => setState(() => _tabIndex = e.key),
-                        child: Container(
-                          margin: EdgeInsets.only(left: e.key == 0 ? 0 : 6),
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          decoration: BoxDecoration(
-                            color: selected ? Colors.brown : Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(
-                              color: selected
-                                  ? Colors.brown
-                                  : const Color(0xFFEAD8C8),
-                            ),
-                          ),
-                          child: Text(
-                            e.value,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: selected
-                                  ? Colors.white
-                                  : const Color(0xFFA07850),
-                            ),
-                          ),
+              children: ['Tạo mới', 'Chỉnh sửa', 'Thư viện'].asMap().entries.map((e) {
+                final selected = _tabIndex == e.key;
+                return Expanded(
+                  child: GestureDetector(
+                    onTap: () => setState(() => _tabIndex = e.key),
+                    child: Container(
+                      margin: EdgeInsets.only(left: e.key == 0 ? 0 : 6),
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      decoration: BoxDecoration(
+                        color: selected ? Colors.brown : Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: selected ? Colors.brown : const Color(0xFFEAD8C8),
                         ),
                       ),
-                    );
-                  })
-                  .toList(),
+                      child: Text(
+                        e.value,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: selected ? Colors.white : const Color(0xFFA07850),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
             ),
           ),
         ),
@@ -108,11 +87,7 @@ class _ItemManagementViewState extends State<ItemManagementView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildField(
-              'TÊN SẢN PHẨM',
-              controller: _nameCtrl,
-              hint: 'Nhập tên áo dài...',
-            ),
+            _buildField('TÊN SẢN PHẨM', controller: _nameCtrl, hint: 'Nhập tên áo dài...'),
             const SizedBox(height: 12),
             _buildField(
               'GIÁ BÁN',
@@ -125,11 +100,7 @@ class _ItemManagementViewState extends State<ItemManagementView> {
             // Colors
             const Text(
               'MÀU SẮC',
-              style: TextStyle(
-                fontSize: 11,
-                color: Color(0xFFA07850),
-                letterSpacing: 0.4,
-              ),
+              style: TextStyle(fontSize: 11, color: Color(0xFFA07850), letterSpacing: 0.4),
             ),
             const SizedBox(height: 4),
             Container(
@@ -152,9 +123,7 @@ class _ItemManagementViewState extends State<ItemManagementView> {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: _selectedColorIndex == i
-                                ? Colors.brown
-                                : Colors.transparent,
+                            color: _selectedColorIndex == i ? Colors.brown : Colors.transparent,
                             width: 2,
                           ),
                         ),
@@ -176,16 +145,9 @@ class _ItemManagementViewState extends State<ItemManagementView> {
                     height: 28,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      border: Border.all(
-                        color: const Color(0xFFD4A574),
-                        style: BorderStyle.solid,
-                      ),
+                      border: Border.all(color: const Color(0xFFD4A574)),
                     ),
-                    child: const Icon(
-                      Icons.add,
-                      size: 14,
-                      color: Color(0xFFD4A574),
-                    ),
+                    child: const Icon(Icons.add, size: 14, color: Color(0xFFD4A574)),
                   ),
                 ],
               ),
@@ -195,11 +157,7 @@ class _ItemManagementViewState extends State<ItemManagementView> {
             // Material dropdown
             const Text(
               'CHẤT LIỆU',
-              style: TextStyle(
-                fontSize: 11,
-                color: Color(0xFFA07850),
-                letterSpacing: 0.4,
-              ),
+              style: TextStyle(fontSize: 11, color: Color(0xFFA07850), letterSpacing: 0.4),
             ),
             const SizedBox(height: 4),
             Container(
@@ -238,11 +196,11 @@ class _ItemManagementViewState extends State<ItemManagementView> {
             const SizedBox(height: 12),
 
             // Images
-            Row(
+            const Row(
               children: [
-                const Icon(Icons.photo_outlined, size: 16, color: Colors.brown),
-                const SizedBox(width: 6),
-                const Text(
+                Icon(Icons.photo_outlined, size: 16, color: Colors.brown),
+                SizedBox(width: 6),
+                Text(
                   'Hình ảnh sản phẩm',
                   style: TextStyle(
                     fontSize: 13,
@@ -261,10 +219,7 @@ class _ItemManagementViewState extends State<ItemManagementView> {
                 decoration: BoxDecoration(
                   color: const Color(0xFFFFFAF5),
                   borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
-                    color: const Color(0xFFD4A574),
-                    style: BorderStyle.solid,
-                  ),
+                  border: Border.all(color: const Color(0xFFD4A574)),
                 ),
                 child: Column(
                   children: [
@@ -275,11 +230,7 @@ class _ItemManagementViewState extends State<ItemManagementView> {
                         color: const Color(0xFFF5E6D4),
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: const Icon(
-                        Icons.cloud_upload_outlined,
-                        color: Colors.brown,
-                        size: 20,
-                      ),
+                      child: const Icon(Icons.cloud_upload_outlined, color: Colors.brown, size: 20),
                     ),
                     const SizedBox(height: 6),
                     const Text(
@@ -298,16 +249,11 @@ class _ItemManagementViewState extends State<ItemManagementView> {
             const Divider(color: Color(0xFFEAD8C8)),
             const SizedBox(height: 12),
 
-            // Gallery
-            Row(
+            const Row(
               children: [
-                const Icon(
-                  Icons.grid_view_rounded,
-                  size: 16,
-                  color: Colors.brown,
-                ),
-                const SizedBox(width: 6),
-                const Text(
+                Icon(Icons.grid_view_rounded, size: 16, color: Colors.brown),
+                SizedBox(width: 6),
+                Text(
                   'Thư viện ảnh',
                   style: TextStyle(
                     fontSize: 13,
@@ -320,11 +266,7 @@ class _ItemManagementViewState extends State<ItemManagementView> {
             const SizedBox(height: 10),
             const Text(
               'CHỌN THƯ VIỆN',
-              style: TextStyle(
-                fontSize: 11,
-                color: Color(0xFFA07850),
-                letterSpacing: 0.4,
-              ),
+              style: TextStyle(fontSize: 11, color: Color(0xFFA07850), letterSpacing: 0.4),
             ),
             const SizedBox(height: 4),
             Container(
@@ -367,14 +309,9 @@ class _ItemManagementViewState extends State<ItemManagementView> {
                     style: OutlinedButton.styleFrom(
                       foregroundColor: Colors.brown,
                       side: const BorderSide(color: Colors.brown),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
-                    child: const Text(
-                      '+ Thêm vào thư viện',
-                      style: TextStyle(fontSize: 12),
-                    ),
+                    child: const Text('+ Thêm vào thư viện', style: TextStyle(fontSize: 12)),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -384,24 +321,15 @@ class _ItemManagementViewState extends State<ItemManagementView> {
                     style: OutlinedButton.styleFrom(
                       foregroundColor: const Color(0xFFC0522A),
                       side: const BorderSide(color: Color(0xFFC0522A)),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
-                    child: const Text(
-                      'Xoá thư viện',
-                      style: TextStyle(fontSize: 12),
-                    ),
+                    child: const Text('Xoá thư viện', style: TextStyle(fontSize: 12)),
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 10),
-            _buildField(
-              'TẠO THƯ VIỆN MỚI',
-              controller: _galleryCtrl,
-              hint: 'Tên thư viện...',
-            ),
+            _buildField('TẠO THƯ VIỆN MỚI', controller: _galleryCtrl, hint: 'Tên thư viện...'),
             const SizedBox(height: 10),
             SizedBox(
               width: double.infinity,
@@ -411,9 +339,7 @@ class _ItemManagementViewState extends State<ItemManagementView> {
                   backgroundColor: const Color(0xFF8B5E3C),
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 ),
                 child: const Text('Tạo thư viện'),
               ),
@@ -427,9 +353,7 @@ class _ItemManagementViewState extends State<ItemManagementView> {
                   backgroundColor: const Color(0xFF6B3A1F),
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 ),
                 child: const Text(
                   'Tạo sản phẩm →',
@@ -455,11 +379,7 @@ class _ItemManagementViewState extends State<ItemManagementView> {
       children: [
         Text(
           label,
-          style: const TextStyle(
-            fontSize: 11,
-            color: Color(0xFFA07850),
-            letterSpacing: 0.4,
-          ),
+          style: const TextStyle(fontSize: 11, color: Color(0xFFA07850), letterSpacing: 0.4),
         ),
         const SizedBox(height: 4),
         TextField(
@@ -471,10 +391,7 @@ class _ItemManagementViewState extends State<ItemManagementView> {
             hintStyle: const TextStyle(color: Color(0xFFC4A882), fontSize: 13),
             filled: true,
             fillColor: Colors.white,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 14,
-              vertical: 10,
-            ),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(color: Color(0xFFEAD8C8)),

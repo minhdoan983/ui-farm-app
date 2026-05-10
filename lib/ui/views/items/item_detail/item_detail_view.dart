@@ -4,7 +4,9 @@ import 'package:ui_farm/resources/resources.dart';
 
 @RoutePage()
 class ItemDetailView extends StatefulWidget {
-  const ItemDetailView({super.key});
+  const ItemDetailView({super.key, @PathParam('itemId') required this.itemId});
+
+  final String itemId;
 
   @override
   State<ItemDetailView> createState() => _ItemDetailViewState();
@@ -16,13 +18,7 @@ class _ItemDetailViewState extends State<ItemDetailView> {
   int _quantity = 1;
   int _selectedThumbIndex = 0;
 
-  final _colors = [
-    Colors.red,
-    Colors.black,
-    Colors.white,
-    Colors.brown,
-    Colors.green,
-  ];
+  final _colors = [Colors.red, Colors.black, Colors.white, Colors.brown, Colors.green];
   final _materials = ['Linen bột', 'Lụa tơ', 'Đũi thô', 'Tuyết mai'];
 
   @override
@@ -35,7 +31,6 @@ class _ItemDetailViewState extends State<ItemDetailView> {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  // Hero image
                   Stack(
                     children: [
                       SizedBox(
@@ -45,10 +40,7 @@ class _ItemDetailViewState extends State<ItemDetailView> {
                       ),
                       SafeArea(
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 14,
-                            vertical: 10,
-                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -71,18 +63,14 @@ class _ItemDetailViewState extends State<ItemDetailView> {
                   // Thumbnails
                   Container(
                     color: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 10,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                     child: SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: Row(
                         children: List.generate(
                           5,
                           (i) => GestureDetector(
-                            onTap: () =>
-                                setState(() => _selectedThumbIndex = i),
+                            onTap: () => setState(() => _selectedThumbIndex = i),
                             child: Container(
                               width: 52,
                               height: 64,
@@ -98,9 +86,7 @@ class _ItemDetailViewState extends State<ItemDetailView> {
                               ),
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(9),
-                                child: Assets.images.shirt1.image(
-                                  fit: BoxFit.cover,
-                                ),
+                                child: Assets.images.shirt1.image(fit: BoxFit.cover),
                               ),
                             ),
                           ),
@@ -130,10 +116,7 @@ class _ItemDetailViewState extends State<ItemDetailView> {
                             ),
                             const SizedBox(width: 10),
                             Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 4,
-                              ),
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                               decoration: BoxDecoration(
                                 color: Colors.brown,
                                 borderRadius: BorderRadius.circular(20),
@@ -165,8 +148,7 @@ class _ItemDetailViewState extends State<ItemDetailView> {
                           children: List.generate(
                             _colors.length,
                             (i) => GestureDetector(
-                              onTap: () =>
-                                  setState(() => _selectedColorIndex = i),
+                              onTap: () => setState(() => _selectedColorIndex = i),
                               child: Container(
                                 width: 28,
                                 height: 28,
@@ -212,17 +194,11 @@ class _ItemDetailViewState extends State<ItemDetailView> {
                           children: List.generate(
                             _materials.length,
                             (i) => GestureDetector(
-                              onTap: () =>
-                                  setState(() => _selectedMaterialIndex = i),
+                              onTap: () => setState(() => _selectedMaterialIndex = i),
                               child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 14,
-                                  vertical: 6,
-                                ),
+                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                                 decoration: BoxDecoration(
-                                  color: _selectedMaterialIndex == i
-                                      ? Colors.brown
-                                      : Colors.white,
+                                  color: _selectedMaterialIndex == i ? Colors.brown : Colors.white,
                                   borderRadius: BorderRadius.circular(20),
                                   border: Border.all(
                                     color: _selectedMaterialIndex == i
@@ -261,16 +237,13 @@ class _ItemDetailViewState extends State<ItemDetailView> {
                               decoration: BoxDecoration(
                                 color: const Color(0xFFFFF0E4),
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: const Color(0xFFEAD8C8),
-                                ),
+                                border: Border.all(color: const Color(0xFFEAD8C8)),
                               ),
                               child: Row(
                                 children: [
                                   GestureDetector(
                                     onTap: () {
-                                      if (_quantity > 1)
-                                        setState(() => _quantity--);
+                                      if (_quantity > 1) setState(() => _quantity--);
                                     },
                                     child: const SizedBox(
                                       width: 36,
@@ -278,10 +251,7 @@ class _ItemDetailViewState extends State<ItemDetailView> {
                                       child: Center(
                                         child: Text(
                                           '−',
-                                          style: TextStyle(
-                                            fontSize: 18,
-                                            color: Colors.brown,
-                                          ),
+                                          style: TextStyle(fontSize: 18, color: Colors.brown),
                                         ),
                                       ),
                                     ),
@@ -302,10 +272,7 @@ class _ItemDetailViewState extends State<ItemDetailView> {
                                       child: Center(
                                         child: Text(
                                           '+',
-                                          style: TextStyle(
-                                            fontSize: 18,
-                                            color: Colors.brown,
-                                          ),
+                                          style: TextStyle(fontSize: 18, color: Colors.brown),
                                         ),
                                       ),
                                     ),
@@ -337,9 +304,7 @@ class _ItemDetailViewState extends State<ItemDetailView> {
                       foregroundColor: Colors.brown,
                       side: const BorderSide(color: Colors.brown, width: 1.5),
                       padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                     ),
                   ),
                 ),
@@ -351,9 +316,7 @@ class _ItemDetailViewState extends State<ItemDetailView> {
                       backgroundColor: Colors.brown,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                     ),
                     child: const Text('Mua ngay →'),
                   ),

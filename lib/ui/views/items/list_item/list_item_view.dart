@@ -1,7 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:ui_farm/resources/resources.dart';
-import 'package:ui_farm/ui/navigation/app_router.gr.dart';
 
 @RoutePage()
 class ListItemView extends StatefulWidget {
@@ -19,7 +18,7 @@ class _ListItemViewState extends State<ListItemView> {
   }
 
   Drawer _buildAllFiltersDrawer() {
-    var sortBy = 1; // 0 Featured, 1 Newest, 2 High-Low, 3 Low-High
+    var sortBy = 1;
     var men = true;
     var women = false;
     var unisex = false;
@@ -42,10 +41,7 @@ class _ListItemViewState extends State<ListItemView> {
                     children: [
                       const Text(
                         'Filter',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                       ),
                       InkWell(
                         borderRadius: BorderRadius.circular(20),
@@ -126,16 +122,14 @@ class _ListItemViewState extends State<ListItemView> {
                             label: 'Purple',
                             color: const Color(0xFF7E3F98),
                             selected: colorPurple,
-                            onTap: () =>
-                                setState(() => colorPurple = !colorPurple),
+                            onTap: () => setState(() => colorPurple = !colorPurple),
                           ),
                           const SizedBox(width: 12),
                           _ColorDot(
                             label: 'Black',
                             color: Colors.black,
                             selected: colorBlack,
-                            onTap: () =>
-                                setState(() => colorBlack = !colorBlack),
+                            onTap: () => setState(() => colorBlack = !colorBlack),
                           ),
                           const SizedBox(width: 12),
                           _ColorDot(
@@ -156,9 +150,7 @@ class _ListItemViewState extends State<ListItemView> {
                       Expanded(
                         child: OutlinedButton(
                           style: OutlinedButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(28),
-                            ),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
                             side: const BorderSide(color: Color(0xFFD0D0D0)),
                           ),
                           onPressed: () => Navigator.pop(context),
@@ -171,9 +163,7 @@ class _ListItemViewState extends State<ListItemView> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.black,
                             foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(28),
-                            ),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
                           ),
                           onPressed: () => Navigator.pop(context),
                           child: const Text('Apply'),
@@ -218,10 +208,7 @@ class _ListItemViewState extends State<ListItemView> {
                       children: [
                         const Text(
                           'Filter by Gender',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                         ),
                         InkWell(
                           borderRadius: BorderRadius.circular(20),
@@ -269,9 +256,7 @@ class _ListItemViewState extends State<ListItemView> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.black,
                           foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(28),
-                          ),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
                         ),
                         onPressed: () => Navigator.pop(context),
                         child: const Text('Apply'),
@@ -309,10 +294,7 @@ class _ListItemViewState extends State<ListItemView> {
                   children: [
                     const Text(
                       'Shop By Price',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                     ),
                     InkWell(
                       borderRadius: BorderRadius.circular(20),
@@ -334,9 +316,7 @@ class _ListItemViewState extends State<ListItemView> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.black,
                       foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(28),
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
                     ),
                     onPressed: () => Navigator.pop(context),
                     child: const Text('Apply'),
@@ -389,11 +369,7 @@ class _ListItemViewState extends State<ListItemView> {
 }
 
 class _FilterBar extends StatelessWidget {
-  const _FilterBar({
-    required this.onTapAll,
-    required this.onTapGender,
-    required this.onTapPrice,
-  });
+  const _FilterBar({required this.onTapAll, required this.onTapGender, required this.onTapPrice});
 
   final VoidCallback onTapAll;
   final VoidCallback onTapGender;
@@ -406,18 +382,8 @@ class _FilterBar extends StatelessWidget {
       child: ListView(
         scrollDirection: Axis.horizontal,
         children: [
-          _FilterPill(
-            label: '(1)',
-            leading: Icons.tune,
-            trailing: null,
-            selected: true,
-            onTap: onTapAll,
-          ),
-          _FilterPill(
-            label: 'Gender (1)',
-            trailing: Icons.keyboard_arrow_down,
-            onTap: onTapGender,
-          ),
+          _FilterPill(label: '(1)', leading: Icons.tune, selected: true, onTap: onTapAll),
+          _FilterPill(label: 'Gender (1)', trailing: Icons.keyboard_arrow_down, onTap: onTapGender),
           _FilterPill(
             label: 'Shop By Price',
             trailing: Icons.keyboard_arrow_down,
@@ -463,20 +429,12 @@ class _FilterPill extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (leading != null) ...[
-                Icon(leading, size: 18),
-                const SizedBox(width: 6),
-              ],
+              if (leading != null) ...[Icon(leading, size: 18), const SizedBox(width: 6)],
               Text(
                 label,
-                style: TextStyle(
-                  fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
-                ),
+                style: TextStyle(fontWeight: selected ? FontWeight.w600 : FontWeight.w500),
               ),
-              if (trailing != null) ...[
-                const SizedBox(width: 6),
-                Icon(trailing, size: 18),
-              ],
+              if (trailing != null) ...[const SizedBox(width: 6), Icon(trailing, size: 18)],
             ],
           ),
         ),
@@ -504,10 +462,7 @@ class _FilterDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.symmetric(vertical: 10),
-      child: Divider(height: 1),
-    );
+    return const Padding(padding: EdgeInsets.symmetric(vertical: 10), child: Divider(height: 1));
   }
 }
 
@@ -530,7 +485,7 @@ class _RadioTile extends StatelessWidget {
       contentPadding: EdgeInsets.zero,
       title: Text(label),
       value: value,
-      groupValue: groupValue,
+      // ignore: deprecated_member_use
       onChanged: (value) {
         if (value != null) {
           onChanged(value);
@@ -541,11 +496,7 @@ class _RadioTile extends StatelessWidget {
 }
 
 class _CheckTile extends StatelessWidget {
-  const _CheckTile({
-    required this.label,
-    required this.value,
-    required this.onChanged,
-  });
+  const _CheckTile({required this.label, required this.value, required this.onChanged});
 
   final String label;
   final bool value;
@@ -594,10 +545,7 @@ class _ColorDot extends StatelessWidget {
             decoration: BoxDecoration(
               color: color,
               shape: BoxShape.circle,
-              border: Border.all(
-                color: selected ? Colors.black : Colors.transparent,
-                width: 2,
-              ),
+              border: Border.all(color: selected ? Colors.black : Colors.transparent, width: 2),
             ),
           ),
           const SizedBox(height: 6),
@@ -614,13 +562,10 @@ class _ItemCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => context.router.push(const ItemDetailRoute()),
+      onTap: () {},
       child: Container(
         padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-        ),
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           spacing: 8,
@@ -633,11 +578,7 @@ class _ItemCard extends StatelessWidget {
                 child: Assets.images.shirt1.image(fit: BoxFit.cover),
               ),
             ),
-            Text(
-              'Áo dài hướng dương thêu chữ',
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
+            const Text('Áo dài hướng dương thêu chữ', maxLines: 2, overflow: TextOverflow.ellipsis),
             Wrap(
               spacing: 10,
               runSpacing: 10,

@@ -8,17 +8,11 @@ class BottomBarNotifier extends ValueNotifier<bool> {
 }
 
 class BottomBarProvider extends InheritedWidget {
+  const BottomBarProvider({super.key, required this.notifier, required super.child});
   final BottomBarNotifier notifier;
 
-  const BottomBarProvider({
-    required this.notifier,
-    required super.child,
-  });
-
   static BottomBarNotifier of(BuildContext context) {
-    return context
-        .dependOnInheritedWidgetOfExactType<BottomBarProvider>()!
-        .notifier;
+    return context.dependOnInheritedWidgetOfExactType<BottomBarProvider>()!.notifier;
   }
 
   @override

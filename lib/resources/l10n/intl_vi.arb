@@ -1,0 +1,155 @@
+{
+    "@@locale": "vi",
+    "username": "Username",
+    "@username": {
+        "description": "Username label"
+    },
+    "phoneNumber": "Phone number",
+    "@phoneNumber": {
+        "description": "Phone number label"
+    },
+    "email": "Email",
+    "@email": {
+        "description": "Email label"
+    },
+    "password": "Password",
+    "@password": {
+        "description": "Password label"
+    },
+    "confirmPassword": "Confirm Password",
+    "@confirmPassword": {
+        "description": "Confirm password label"
+    },
+    "signUp": "Đăng Kí",
+    "@signUp": {
+        "description": "Sign up button"
+    },
+    "signIn": "Đăng Nhập",
+    "@signIn": {
+        "description": "Sign in button"
+    },
+    "footer": "🇻🇳 UI Farm Ho Chi Minh city 🇻🇳",
+    "@footer": {
+        "description": "Footer text"
+    },
+    "profileUpdateSuccess": "Cập nhật thành công",
+    "@profileUpdateSuccess": {
+        "description": "Profile update success message"
+    },
+    "profileDefaultName": "UI Farm",
+    "@profileDefaultName": {
+        "description": "Default profile name"
+    },
+    "profileNameLabel": "Name",
+    "@profileNameLabel": {
+        "description": "Profile name label"
+    },
+    "profileEmailLabel": "Your Email",
+    "@profileEmailLabel": {
+        "description": "Profile email label"
+    },
+    "profilePhoneLabel": "Phone Number",
+    "@profilePhoneLabel": {
+        "description": "Profile phone label"
+    },
+    "profileSaveButton": "Lưu thay đổi",
+    "@profileSaveButton": {
+        "description": "Save profile button"
+    },
+    "appTitle": "UI Farm",
+    "@appTitle": {
+        "description": "Application title"
+    },
+    "drawerHome": "Trang chủ",
+    "@drawerHome": {
+        "description": "Drawer home item"
+    },
+    "drawerProducts": "Sản phẩm",
+    "@drawerProducts": {
+        "description": "Drawer products item"
+    },
+    "drawerStore": "Cửa hàng",
+    "@drawerStore": {
+        "description": "Drawer store item"
+    },
+    "drawerContact": "Liên hệ",
+    "@drawerContact": {
+        "description": "Drawer contact item"
+    },
+    "drawerOrderManagement": "Quản lý đơn hàng",
+    "@drawerOrderManagement": {
+        "description": "Drawer order management item"
+    },
+    "drawerProductManagement": "Quản lý sản phẩm",
+    "@drawerProductManagement": {
+        "description": "Drawer product management item"
+    },
+    "drawerProfileInfo": "Thông tin cá nhân",
+    "@drawerProfileInfo": {
+        "description": "Drawer profile info item"
+    },
+    "drawerLogout": "Đăng xuất",
+    "@drawerLogout": {
+        "description": "Drawer logout item"
+    },
+    "bottomHome": "Home",
+    "@bottomHome": {
+        "description": "Bottom bar home label"
+    },
+    "bottomProfile": "Profile",
+    "@bottomProfile": {
+        "description": "Bottom bar profile label"
+    },
+    "bottomStore": "Store",
+    "@bottomStore": {
+        "description": "Bottom bar store label"
+    },
+    "contactTitle": "Contact with UI Farm",
+    "@contactTitle": {
+        "description": "Contact page title"
+    },
+    "contactDescription": "Đặt may áo dài tại FB: UI Farm hoặc IG: @uifarm_2020. Bạn có thể đặt online hoặc tới trực tiếp studio của UI để được tư vấn. Chuẩn bị may ra tà áo đẹp nhất VN.",
+    "@contactDescription": {
+        "description": "Contact page description"
+    },
+    "contactFacebook": "Facebook",
+    "@contactFacebook": {
+        "description": "Contact Facebook button label"
+    },
+    "contactInstagram": "Instagram",
+    "@contactInstagram": {
+        "description": "Contact Instagram button label"
+    },
+    "contactTagUifarm": "#uifarm",
+    "@contactTagUifarm": {
+        "description": "Contact tag #uifarm"
+    },
+    "contactTagAodai": "#aodai",
+    "@contactTagAodai": {
+        "description": "Contact tag #aodai"
+    },
+    "contactTagAodaiVn": "#aodaivietnam",
+    "@contactTagAodaiVn": {
+        "description": "Contact tag #aodaivietnam"
+    },
+    "contactTagVietnam": "#vietnam",
+    "@contactTagVietnam": {
+        "description": "Contact tag #vietnam"
+    },
+    "contactTagLinen": "#linen",
+    "@contactTagLinen": {
+        "description": "Contact tag #linen"
+    },
+    "contactTagMuongXanh": "#muongxanh",
+    "@contactTagMuongXanh": {
+        "description": "Contact tag #muongxanh"
+    },
+    "contactTagSilk": "#silk",
+    "@contactTagSilk": {
+        "description": "Contact tag #silk"
+    },
+    "cartBadge99": "99+",
+    "@cartBadge99": {
+        "description": "Cart badge label for 99+"
+    }
+}
