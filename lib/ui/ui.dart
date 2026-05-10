@@ -15,6 +15,7 @@ export 'views/contact/contact_view.dart';
 export 'views/home/home_view.dart';
 export 'views/items/item_detail/item_detail_view.dart';
 export 'views/items/item_management/item_management_view.dart';
+export 'views/items/list_item/bloc/list_item_bloc.dart';
 export 'views/items/list_item/list_item_view.dart';
 export 'views/main/main_view.dart';
 export 'views/order_management/bloc/order_management_bloc.dart';

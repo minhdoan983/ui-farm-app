@@ -103,4 +103,36 @@ class AppApiService {
     );
     return result ?? [];
   }
+
+  Future<List<GalleryData>> getGalleries() async {
+    final result = await _serverApiClient.request(
+      method: RequestMethod.get,
+      path: '/galleries',
+      decoder: (data) => (data as List<dynamic>)
+          .map((e) => GalleryData.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+    return result ?? [];
+  }
+
+  Future<FilteredItemsData?> getFilteredItems({
+    String? color,
+    String? galleryName,
+    int? minPrice,
+    int? maxPrice,
+    int page = 1,
+  }) async {
+    return await _serverApiClient.request(
+      method: RequestMethod.get,
+      path: '/items/filter/',
+      queryParameters: {
+        'with_color': color ?? '',
+        'with_gallery': galleryName ?? '',
+        'min_price': minPrice?.toString() ?? '',
+        'max_price': maxPrice?.toString() ?? '',
+        'page': page.toString(),
+      },
+      decoder: (data) => FilteredItemsData.fromJson(data as Map<String, dynamic>),
+    );
+  }
 }

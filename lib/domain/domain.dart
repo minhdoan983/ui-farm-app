@@ -1,6 +1,7 @@
 export 'entities/auth_token.dart';
 export 'entities/cart.dart';
 export 'entities/cart_item.dart';
+export 'entities/gallery.dart';
 export 'entities/item.dart';
 export 'entities/order.dart';
 export 'entities/order_item.dart';
@@ -22,5 +23,7 @@ export 'usecases/base/sync/base_sync_use_case.dart';
 export 'usecases/cart/get_cart_use_case.dart';
 export 'usecases/cart/remove_cart_item_use_case.dart';
 export 'usecases/cart/update_cart_quantity_use_case.dart';
+export 'usecases/item/get_filtered_items_use_case.dart';
+export 'usecases/item/get_galleries_use_case.dart';
 export 'usecases/item/get_items_use_case.dart';
 export 'usecases/order/get_orders_use_case.dart';

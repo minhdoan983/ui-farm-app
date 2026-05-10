@@ -1,6 +1,9 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:ui_farm/resources/resources.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ui_farm/di/injection.dart';
+import 'package:ui_farm/domain/domain.dart';
+import 'package:ui_farm/ui/ui.dart';
 
 @RoutePage()
 class ListItemView extends StatefulWidget {
@@ -10,46 +13,160 @@ class ListItemView extends StatefulWidget {
   State<ListItemView> createState() => _ListItemViewState();
 }
 
-class _ListItemViewState extends State<ListItemView> {
+class _ListItemViewState extends BasePageState<ListItemView, ListItemBloc> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
+  final _scrollController = ScrollController();
 
-  void _openAllFilters() {
-    _scaffoldKey.currentState?.openDrawer();
+  @override
+  void initState() {
+    super.initState();
+    bloc.add(const ListItemViewInitiated());
+    _scrollController.addListener(_onScroll);
   }
 
-  Drawer _buildAllFiltersDrawer() {
-    var sortBy = 1;
-    var men = true;
-    var women = false;
-    var unisex = false;
-    var under1m = false;
-    var sale = false;
-    var colorPurple = false;
-    var colorBlack = true;
-    var colorRed = false;
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
+      bloc.add(const ListItemLoadMore());
+    }
+  }
+
+  void _openAllFilters() => _scaffoldKey.currentState?.openDrawer();
+
+  @override
+  Widget buildPage(BuildContext context) {
+    return BlocBuilder<ListItemBloc, ListItemState>(
+      buildWhen: (p, c) => p.galleries != c.galleries,
+      builder: (context, state) {
+        return Scaffold(
+          key: _scaffoldKey,
+          drawer: _buildFilterDrawer(context, state),
+          body: CustomScrollView(
+            controller: _scrollController,
+            slivers: [
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 12, left: 18, right: 18),
+                  child: _FilterBar(
+                    onTapAll: _openAllFilters,
+                    galleries: state.galleries,
+                    onTapGallery: (gallery) =>
+                        bloc.add(ListItemFilterApplied(galleryName: gallery.name)),
+                    selectedGalleryName: state.selectedGalleryName,
+                  ),
+                ),
+              ),
+              BlocBuilder<ListItemBloc, ListItemState>(
+                buildWhen: (p, c) => p.items != c.items || p.isLoading != c.isLoading,
+                builder: (context, state) {
+                  if (state.isLoading) {
+                    return const SliverFillRemaining(
+                      child: Center(child: CircularProgressIndicator(color: Colors.brown)),
+                    );
+                  }
+
+                  if (state.items.isEmpty) {
+                    return const SliverFillRemaining(
+                      child: Center(
+                        child: Text(
+                          'Không tìm thấy sản phẩm',
+                          style: TextStyle(color: Color(0xFFA07850)),
+                        ),
+                      ),
+                    );
+                  }
+
+                  return SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(18, 12, 18, 0),
+                    sliver: SliverGrid(
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 16,
+                        mainAxisSpacing: 20,
+                        childAspectRatio: 0.65,
+                      ),
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) => _ItemCard(item: state.items[index]),
+                        childCount: state.items.length,
+                      ),
+                    ),
+                  );
+                },
+              ),
+
+              // Load more indicator
+              BlocBuilder<ListItemBloc, ListItemState>(
+                buildWhen: (p, c) =>
+                    p.isLoadingMore != c.isLoadingMore || p.hasReachedMax != c.hasReachedMax,
+                builder: (context, state) {
+                  if (state.hasReachedMax) {
+                    return const SliverToBoxAdapter(
+                      child: Padding(
+                        padding: EdgeInsets.all(16),
+                        child: Center(
+                          child: Text(
+                            'Đã hiển thị tất cả sản phẩm',
+                            style: TextStyle(color: Color(0xFFA07850), fontSize: 12),
+                          ),
+                        ),
+                      ),
+                    );
+                  }
+                  if (state.isLoadingMore) {
+                    return const SliverToBoxAdapter(
+                      child: Padding(
+                        padding: EdgeInsets.all(16),
+                        child: Center(child: CircularProgressIndicator(color: Colors.brown)),
+                      ),
+                    );
+                  }
+                  return const SliverToBoxAdapter(child: SizedBox(height: 16));
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildFilterDrawer(BuildContext context, ListItemState state) {
+    String? tempColor = state.selectedColor;
+    String? tempGalleryName = state.selectedGalleryName;
+    int? tempMinPrice = state.minPrice;
+    int? tempMaxPrice = state.maxPrice;
+
+    final minPriceCtrl = TextEditingController(text: state.minPrice?.toString() ?? '');
+    final maxPriceCtrl = TextEditingController(text: state.maxPrice?.toString() ?? '');
+
+    // lấy tất cả màu từ AppBloc items (đầy đủ hơn là từ filtered items)
+    final colors = getIt<AppBloc>().state.items.expand((item) => item.color).toSet().toList()
+      ..sort();
 
     return Drawer(
       child: SafeArea(
         child: StatefulBuilder(
-          builder: (context, setState) {
+          builder: (context, setDrawerState) {
             return Column(
               children: [
+                // Header
                 Padding(
                   padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text(
-                        'Filter',
+                        'Bộ lọc',
                         style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                       ),
-                      InkWell(
-                        borderRadius: BorderRadius.circular(20),
-                        onTap: () => Navigator.pop(context),
-                        child: const Padding(
-                          padding: EdgeInsets.all(6),
-                          child: Icon(Icons.close, size: 20),
-                        ),
+                      IconButton(
+                        onPressed: () => Navigator.pop(context),
+                        icon: const Icon(Icons.close, size: 20),
                       ),
                     ],
                   ),
@@ -58,91 +175,120 @@ class _ListItemViewState extends State<ListItemView> {
                   child: ListView(
                     padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
                     children: [
-                      const _FilterSectionTitle('Sort By'),
-                      _RadioTile(
-                        label: 'Featured',
-                        value: 0,
-                        groupValue: sortBy,
-                        onChanged: (value) => setState(() => sortBy = value),
+                      // Gallery
+                      const _FilterSectionTitle('Bộ sưu tập'),
+                      // Option "Tất cả"
+                      RadioListTile<String?>(
+                        contentPadding: EdgeInsets.zero,
+                        title: const Text('Tất cả'),
+                        value: null,
+                        groupValue: tempGalleryName,
+                        activeColor: Colors.brown,
+                        onChanged: (_) => setDrawerState(() => tempGalleryName = null),
                       ),
-                      _RadioTile(
-                        label: 'Newest',
-                        value: 1,
-                        groupValue: sortBy,
-                        onChanged: (value) => setState(() => sortBy = value),
-                      ),
-                      _RadioTile(
-                        label: 'Price: High-Low',
-                        value: 2,
-                        groupValue: sortBy,
-                        onChanged: (value) => setState(() => sortBy = value),
-                      ),
-                      _RadioTile(
-                        label: 'Price: Low-High',
-                        value: 3,
-                        groupValue: sortBy,
-                        onChanged: (value) => setState(() => sortBy = value),
+                      ...state.galleries.map(
+                        (gallery) => RadioListTile<String?>(
+                          contentPadding: EdgeInsets.zero,
+                          title: Text(gallery.name),
+                          value: gallery.name,
+                          groupValue: tempGalleryName,
+                          activeColor: Colors.brown,
+                          onChanged: (value) => setDrawerState(() => tempGalleryName = value),
+                        ),
                       ),
                       const _FilterDivider(),
-                      const _FilterSectionTitle('Gender (1)'),
-                      _CheckTile(
-                        label: 'Men',
-                        value: men,
-                        onChanged: (value) => setState(() => men = value),
-                      ),
-                      _CheckTile(
-                        label: 'Women',
-                        value: women,
-                        onChanged: (value) => setState(() => women = value),
-                      ),
-                      _CheckTile(
-                        label: 'Unisex',
-                        value: unisex,
-                        onChanged: (value) => setState(() => unisex = value),
+
+                      // Color
+                      const _FilterSectionTitle('Màu sắc'),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          // Option "Tất cả màu"
+                          GestureDetector(
+                            onTap: () => setDrawerState(() => tempColor = null),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: tempColor == null ? Colors.brown : Colors.transparent,
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: tempColor == null ? Colors.brown : const Color(0xFFD0D0D0),
+                                ),
+                              ),
+                              child: Text(
+                                'Tất cả',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: tempColor == null ? Colors.white : Colors.black,
+                                ),
+                              ),
+                            ),
+                          ),
+                          ...colors.map((color) {
+                            final isSelected = tempColor == color;
+                            return GestureDetector(
+                              onTap: () =>
+                                  setDrawerState(() => tempColor = isSelected ? null : color),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: isSelected ? Colors.brown : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(
+                                    color: isSelected ? Colors.brown : const Color(0xFFD0D0D0),
+                                  ),
+                                ),
+                                child: Text(
+                                  color,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: isSelected ? Colors.white : Colors.black,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }),
+                        ],
                       ),
                       const _FilterDivider(),
-                      const _FilterSectionTitle('Shop By Price'),
-                      _CheckTile(
-                        label: 'Under 1,000,000đ',
-                        value: under1m,
-                        onChanged: (value) => setState(() => under1m = value),
-                      ),
-                      const _FilterDivider(),
-                      const _FilterSectionTitle('Sale & Offers'),
-                      _CheckTile(
-                        label: 'Sale',
-                        value: sale,
-                        onChanged: (value) => setState(() => sale = value),
-                      ),
-                      const _FilterDivider(),
-                      const _FilterSectionTitle('Colour'),
+
+                      // Price
+                      const _FilterSectionTitle('Khoảng giá'),
                       Row(
                         children: [
-                          _ColorDot(
-                            label: 'Purple',
-                            color: const Color(0xFF7E3F98),
-                            selected: colorPurple,
-                            onTap: () => setState(() => colorPurple = !colorPurple),
+                          Expanded(
+                            child: TextField(
+                              controller: minPriceCtrl,
+                              keyboardType: TextInputType.number,
+                              decoration: const InputDecoration(
+                                labelText: 'Từ (đ)',
+                                border: OutlineInputBorder(),
+                                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              ),
+                              onChanged: (value) => tempMinPrice = int.tryParse(value),
+                            ),
                           ),
                           const SizedBox(width: 12),
-                          _ColorDot(
-                            label: 'Black',
-                            color: Colors.black,
-                            selected: colorBlack,
-                            onTap: () => setState(() => colorBlack = !colorBlack),
-                          ),
-                          const SizedBox(width: 12),
-                          _ColorDot(
-                            label: 'Red',
-                            color: Colors.red,
-                            selected: colorRed,
-                            onTap: () => setState(() => colorRed = !colorRed),
+                          Expanded(
+                            child: TextField(
+                              controller: maxPriceCtrl,
+                              keyboardType: TextInputType.number,
+                              decoration: const InputDecoration(
+                                labelText: 'Đến (đ)',
+                                border: OutlineInputBorder(),
+                                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              ),
+                              onChanged: (value) => tempMaxPrice = int.tryParse(value),
+                            ),
                           ),
                         ],
                       ),
                     ],
                   ),
                 ),
+
+                // Buttons
                 Padding(
                   padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
                   child: Row(
@@ -153,20 +299,35 @@ class _ListItemViewState extends State<ListItemView> {
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
                             side: const BorderSide(color: Color(0xFFD0D0D0)),
                           ),
-                          onPressed: () => Navigator.pop(context),
-                          child: const Text('Clear (1)'),
+                          onPressed: () {
+                            minPriceCtrl.clear();
+                            maxPriceCtrl.clear();
+                            Navigator.pop(context);
+                            bloc.add(const ListItemFilterCleared());
+                          },
+                          child: const Text('Xoá bộ lọc'),
                         ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.black,
+                            backgroundColor: Colors.brown,
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
                           ),
-                          onPressed: () => Navigator.pop(context),
-                          child: const Text('Apply'),
+                          onPressed: () {
+                            Navigator.pop(context);
+                            bloc.add(
+                              ListItemFilterApplied(
+                                color: tempColor,
+                                galleryName: tempGalleryName,
+                                minPrice: tempMinPrice,
+                                maxPrice: tempMaxPrice,
+                              ),
+                            );
+                          },
+                          child: const Text('Áp dụng'),
                         ),
                       ),
                     ],
@@ -179,241 +340,64 @@ class _ListItemViewState extends State<ListItemView> {
       ),
     );
   }
-
-  void _openGenderFilter() {
-    showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (context) {
-        var men = true;
-        var women = false;
-        var unisex = false;
-
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return SafeArea(
-              top: false,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'Filter by Gender',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                        ),
-                        InkWell(
-                          borderRadius: BorderRadius.circular(20),
-                          onTap: () => Navigator.pop(context),
-                          child: const Padding(
-                            padding: EdgeInsets.all(6),
-                            child: Icon(Icons.close, size: 20),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    CheckboxListTile(
-                      contentPadding: EdgeInsets.zero,
-                      title: const Text('Men'),
-                      value: men,
-                      onChanged: (value) => setState(() {
-                        men = value ?? false;
-                      }),
-                      controlAffinity: ListTileControlAffinity.leading,
-                    ),
-                    CheckboxListTile(
-                      contentPadding: EdgeInsets.zero,
-                      title: const Text('Women'),
-                      value: women,
-                      onChanged: (value) => setState(() {
-                        women = value ?? false;
-                      }),
-                      controlAffinity: ListTileControlAffinity.leading,
-                    ),
-                    CheckboxListTile(
-                      contentPadding: EdgeInsets.zero,
-                      title: const Text('Unisex'),
-                      value: unisex,
-                      onChanged: (value) => setState(() {
-                        unisex = value ?? false;
-                      }),
-                      controlAffinity: ListTileControlAffinity.leading,
-                    ),
-                    const SizedBox(height: 16),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 52,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.black,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
-                        ),
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text('Apply'),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
-  void _openPriceFilter() {
-    showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (context) {
-        return SafeArea(
-          top: false,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Shop By Price',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                    ),
-                    InkWell(
-                      borderRadius: BorderRadius.circular(20),
-                      onTap: () => Navigator.pop(context),
-                      child: const Padding(
-                        padding: EdgeInsets.all(6),
-                        child: Icon(Icons.close, size: 20),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                const Text('Chưa có nội dung filter giá.'),
-                const SizedBox(height: 16),
-                SizedBox(
-                  width: double.infinity,
-                  height: 52,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
-                    ),
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text('Apply'),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      drawer: _buildAllFiltersDrawer(),
-      body: CustomScrollView(
-        slivers: [
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.only(top: 12, left: 18, right: 18),
-              child: _FilterBar(
-                onTapAll: _openAllFilters,
-                onTapGender: _openGenderFilter,
-                onTapPrice: _openPriceFilter,
-              ),
-            ),
-          ),
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(18, 12, 18, 0),
-            sliver: SliverGrid(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 20,
-                mainAxisExtent: 360,
-              ),
-              delegate: SliverChildBuilderDelegate(
-                (context, index) => const _ItemCard(),
-                childCount: 10,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 class _FilterBar extends StatelessWidget {
-  const _FilterBar({required this.onTapAll, required this.onTapGender, required this.onTapPrice});
+  const _FilterBar({
+    required this.onTapAll,
+    required this.galleries,
+    required this.onTapGallery,
+    required this.selectedGalleryName, // 👈 đổi từ selectedGalleryId
+  });
 
   final VoidCallback onTapAll;
-  final VoidCallback onTapGender;
-  final VoidCallback onTapPrice;
+  final List<Gallery> galleries;
+  final ValueChanged<Gallery> onTapGallery;
+  final String? selectedGalleryName; // 👈
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 40,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        children: [
-          _FilterPill(label: '(1)', leading: Icons.tune, selected: true, onTap: onTapAll),
-          _FilterPill(label: 'Gender (1)', trailing: Icons.keyboard_arrow_down, onTap: onTapGender),
-          _FilterPill(
-            label: 'Shop By Price',
-            trailing: Icons.keyboard_arrow_down,
-            onTap: onTapPrice,
+    return BlocBuilder<ListItemBloc, ListItemState>(
+      buildWhen: (p, c) =>
+          p.hasActiveFilter != c.hasActiveFilter ||
+          p.selectedGalleryName != c.selectedGalleryName, // 👈
+      builder: (context, state) {
+        return SizedBox(
+          height: 40,
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            children: [
+              _FilterPill(
+                label: state.hasActiveFilter ? 'Bộ lọc (!)' : 'Bộ lọc',
+                leading: Icons.tune,
+                selected: state.hasActiveFilter,
+                onTap: onTapAll,
+              ),
+              ...galleries.map(
+                (gallery) => _FilterPill(
+                  label: gallery.name,
+                  selected: selectedGalleryName == gallery.name, // 👈
+                  onTap: () => onTapGallery(gallery),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
 
 class _FilterPill extends StatelessWidget {
-  const _FilterPill({
-    required this.label,
-    this.leading,
-    this.trailing,
-    this.selected = false,
-    this.onTap,
-  });
+  const _FilterPill({required this.label, this.leading, this.selected = false, this.onTap});
 
   final String label;
   final IconData? leading;
-  final IconData? trailing;
   final bool selected;
   final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    final borderColor = selected ? Colors.black : const Color(0xFF3B3B3B);
-
     return Padding(
       padding: const EdgeInsets.only(right: 10),
       child: InkWell(
@@ -422,19 +406,25 @@ class _FilterPill extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           decoration: BoxDecoration(
-            color: Colors.transparent,
+            color: selected ? Colors.brown : Colors.transparent,
             borderRadius: BorderRadius.circular(22),
-            border: Border.all(color: borderColor),
+            border: Border.all(color: selected ? Colors.brown : const Color(0xFF3B3B3B)),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (leading != null) ...[Icon(leading, size: 18), const SizedBox(width: 6)],
+              if (leading != null) ...[
+                Icon(leading, size: 18, color: selected ? Colors.white : Colors.black),
+                const SizedBox(width: 6),
+              ],
               Text(
                 label,
-                style: TextStyle(fontWeight: selected ? FontWeight.w600 : FontWeight.w500),
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: selected ? Colors.white : Colors.black,
+                ),
               ),
-              if (trailing != null) ...[const SizedBox(width: 6), Icon(trailing, size: 18)],
             ],
           ),
         ),
@@ -443,9 +433,123 @@ class _FilterPill extends StatelessWidget {
   }
 }
 
+class _ItemCard extends StatelessWidget {
+  const _ItemCard({required this.item});
+  final Item item;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => context.router.push(ItemDetailRoute(itemId: item.id)),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Image
+            Expanded(
+              child: ClipRRect(
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                child: item.imgUrl.isNotEmpty
+                    ? Image.network(
+                        item.imgUrl.first,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => _placeholder(),
+                      )
+                    : _placeholder(),
+              ),
+            ),
+
+            // Info
+            Padding(
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    item.name,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xFF3D1F0A),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  // Colors
+                  Wrap(
+                    spacing: 4,
+                    children: item.color
+                        .map(
+                          (c) => Container(
+                            width: 14,
+                            height: 14,
+                            decoration: BoxDecoration(
+                              color: _colorFromName(c),
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.black12),
+                            ),
+                          ),
+                        )
+                        .toList(),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    _formatPrice(item.price),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.brown,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _placeholder() {
+    return Container(
+      color: const Color(0xFFD4B896),
+      child: const Icon(Icons.checkroom_rounded, color: Colors.white54, size: 40),
+    );
+  }
+
+  String _formatPrice(int price) {
+    return '${price.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.')} đ';
+  }
+
+  Color _colorFromName(String name) {
+    return switch (name.toLowerCase()) {
+      'đỏ' => Colors.red,
+      'trắng' => Colors.white,
+      'đen' => Colors.black,
+      'be' => const Color(0xFFD4B896),
+      'tím' => Colors.purple,
+      'xanh cổ vịt' => const Color(0xFF006D77),
+      'hồng đào' => const Color(0xFFFF6B9D),
+      _ => Colors.grey,
+    };
+  }
+}
+
 class _FilterSectionTitle extends StatelessWidget {
   const _FilterSectionTitle(this.text);
-
   final String text;
 
   @override
@@ -463,175 +567,5 @@ class _FilterDivider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Padding(padding: EdgeInsets.symmetric(vertical: 10), child: Divider(height: 1));
-  }
-}
-
-class _RadioTile extends StatelessWidget {
-  const _RadioTile({
-    required this.label,
-    required this.value,
-    required this.groupValue,
-    required this.onChanged,
-  });
-
-  final String label;
-  final int value;
-  final int groupValue;
-  final ValueChanged<int> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return RadioListTile<int>(
-      contentPadding: EdgeInsets.zero,
-      title: Text(label),
-      value: value,
-      // ignore: deprecated_member_use
-      onChanged: (value) {
-        if (value != null) {
-          onChanged(value);
-        }
-      },
-    );
-  }
-}
-
-class _CheckTile extends StatelessWidget {
-  const _CheckTile({required this.label, required this.value, required this.onChanged});
-
-  final String label;
-  final bool value;
-  final ValueChanged<bool> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return CheckboxListTile(
-      contentPadding: EdgeInsets.zero,
-      title: Text(label),
-      value: value,
-      onChanged: (value) {
-        if (value != null) {
-          onChanged(value);
-        }
-      },
-      controlAffinity: ListTileControlAffinity.leading,
-    );
-  }
-}
-
-class _ColorDot extends StatelessWidget {
-  const _ColorDot({
-    required this.label,
-    required this.color,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final String label;
-  final Color color;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(26),
-      onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 28,
-            height: 28,
-            decoration: BoxDecoration(
-              color: color,
-              shape: BoxShape.circle,
-              border: Border.all(color: selected ? Colors.black : Colors.transparent, width: 2),
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(label, style: const TextStyle(fontSize: 12)),
-        ],
-      ),
-    );
-  }
-}
-
-class _ItemCard extends StatelessWidget {
-  const _ItemCard();
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {},
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: 8,
-          children: [
-            SizedBox(
-              height: 200,
-              width: double.infinity,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: Assets.images.shirt1.image(fit: BoxFit.cover),
-              ),
-            ),
-            const Text('Áo dài hướng dương thêu chữ', maxLines: 2, overflow: TextOverflow.ellipsis),
-            Wrap(
-              spacing: 10,
-              runSpacing: 10,
-              children: [
-                Container(
-                  width: 30,
-                  height: 15,
-                  decoration: BoxDecoration(
-                    color: Colors.red,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                Container(
-                  width: 30,
-                  height: 15,
-                  decoration: BoxDecoration(
-                    color: Colors.black,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                Container(
-                  width: 30,
-                  height: 15,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(),
-                  ),
-                ),
-                Container(
-                  width: 30,
-                  height: 15,
-                  decoration: BoxDecoration(
-                    color: Colors.brown,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(),
-                  ),
-                ),
-                Container(
-                  width: 30,
-                  height: 15,
-                  decoration: BoxDecoration(
-                    color: Colors.green,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(),
-                  ),
-                ),
-              ],
-            ),
-            Text('Giá: 3.415.000'),
-          ],
-        ),
-      ),
-    );
   }
 }
