@@ -7,16 +7,16 @@
 ## 📱 Screenshots
 
 | Login | Register | Home |
-|-------|----------|------|
-| _paste screenshot_ | _paste screenshot_ | _paste screenshot_ |
+|---|---|---|
+| <img width="300" height="600" alt="Screenshot_1778423334" src="https://github.com/user-attachments/assets/edd64282-e519-4d77-af5a-d0e01c1782ec" /> | <img width="300" height="600" alt="Screenshot_1778423454" src="https://github.com/user-attachments/assets/7a9ee9e9-eef8-43c5-b741-fa5b50ab4e9f" /> | <img width="300" height="600" alt="Screenshot_1778423532" src="https://github.com/user-attachments/assets/b7148d0a-e2cd-405b-9832-4c183bddb58a" />  <img width="300" height="600" alt="Screenshot_1778423515" src="https://github.com/user-attachments/assets/d6e5159f-0280-4e9f-881d-972f652ce305" /> |
 
 | Product List | Product Detail | Cart |
-|--------------|---------------|------|
-| _paste screenshot_ | _paste screenshot_ | _paste screenshot_ |
+|---|---|---|
+| <img width="300" height="600" alt="Screenshot_1778424199" src="https://github.com/user-attachments/assets/873c3a2d-51ad-43fb-8edf-b98c1c624c9a" /> | _paste screenshot_ | <img width="300" height="600" alt="Screenshot_1778424118" src="https://github.com/user-attachments/assets/4d4505e1-b1d8-474e-92a7-78fe17ca00e6" /> |
 
 | Order Management | Profile | Contact |
-|-----------------|---------|---------|
-| _paste screenshot_ | _paste screenshot_ | _paste screenshot_ |
+|---|---|---|
+| <img width="300" height="600" alt="Screenshot_1778424089" src="https://github.com/user-attachments/assets/a846317f-8397-4848-ad2a-93a8ee0a8e7f" /> | <img width="300" height="600" alt="Screenshot_1778423960" src="https://github.com/user-attachments/assets/3751ca29-2218-454d-803a-13adee049240" /> | <img width="300" height="600" alt="Screenshot_1778423995" src="https://github.com/user-attachments/assets/013683ad-0df4-4ac6-95d7-883f5114eafe" /> |
 
 ---
 
@@ -114,7 +114,6 @@ View → Event → BLoC → UseCase → Repository (interface)
 
 - Flutter SDK `>=3.0.0`
 - Dart SDK `>=3.0.0`
-- FVM (Flutter Version Manager) — recommended
 
 ### Installation
 
@@ -127,19 +126,10 @@ cd ui_farm_app
 flutter pub get
 
 # Run code generation
-dart run build_runner build --delete-conflicting-outputs
+make build_all
 
 # Run the app
 flutter run
-```
-
-### With FVM
-
-```bash
-fvm install
-fvm flutter pub get
-make build_all
-fvm flutter run
 ```
 
 ---
