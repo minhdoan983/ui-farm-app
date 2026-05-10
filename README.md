@@ -1,16 +1,226 @@
-# ui_farm_app
+# 🌸 UI Farm – Áo Dài E-Commerce App
 
-A new Flutter project.
+> A feature-rich mobile e-commerce application for traditional Vietnamese Áo Dài, built with Flutter and Clean Architecture.
 
-## Getting Started
+---
 
-This project is a starting point for a Flutter application.
+## 📱 Screenshots
 
-A few resources to get you started if this is your first Flutter project:
+| Login | Register | Home |
+|-------|----------|------|
+| _paste screenshot_ | _paste screenshot_ | _paste screenshot_ |
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+| Product List | Product Detail | Cart |
+|--------------|---------------|------|
+| _paste screenshot_ | _paste screenshot_ | _paste screenshot_ |
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+| Order Management | Profile | Contact |
+|-----------------|---------|---------|
+| _paste screenshot_ | _paste screenshot_ | _paste screenshot_ |
+
+---
+
+## ✨ Features
+
+- **Authentication** — Login, Register with JWT Bearer Token
+- **Product Browsing** — Browse products with filter by color, gallery/collection, and price range
+- **Pagination** — Infinite scroll / load more for product list
+- **Product Detail** — View full product details with image gallery, color and material selection
+- **Shopping Cart** — Add to cart, update quantity, remove items
+- **Order Management** — View order history with status tracking (Pending / Approved / Cancelled)
+- **Profile Management** — Update personal info (name, phone, avatar)
+- **Responsive Navigation** — Tab-based navigation with nested routes, animated bottom bar hide/show on scroll
+
+---
+
+## 🏗️ Architecture
+
+This project follows **Clean Architecture** principles with clear separation of concerns across three layers:
+
+```
+lib/
+├── config/               # App configuration & initialization
+├── di/                   # Dependency Injection setup (GetIt + Injectable)
+├── domain/               # Business logic layer
+│   ├── entities/         # Pure Dart domain models
+│   ├── repositories/     # Abstract repository interfaces
+│   └── usecases/         # Single-responsibility use cases
+│       ├── auth/
+│       ├── item/
+│       ├── cart/
+│       └── order/
+├── data/                 # Data layer
+│   ├── api/
+│   │   ├── models/       # API response data models (Freezed + JSON)
+│   │   ├── mapper/       # Data ↔ Domain mappers
+│   │   └── interceptors/ # Dio interceptors (Auth, Logging)
+│   ├── repositories/     # Repository implementations
+│   └── app_api_service.dart
+├── shared/               # Shared utilities
+│   ├── base/             # BaseBloc, BaseUseCase, BaseDataMapper, BasePageState
+│   ├── enums/            # RestMethod, etc.
+│   └── exceptions/       # AppException, RemoteException, ServerError
+├── resources/            # Assets, fonts, localization
+└── ui/                   # Presentation layer
+    ├── app/              # AppBloc (global state)
+    ├── views/
+    │   ├── login/
+    │   ├── register/
+    │   ├── home/
+    │   ├── list_item/
+    │   ├── item_detail/
+    │   ├── cart/
+    │   ├── order_management/
+    │   ├── profile/
+    │   └── contact/
+    └── widgets/          # Reusable widgets
+```
+
+### Data Flow
+
+```
+View → Event → BLoC → UseCase → Repository (interface)
+                                      ↓
+                              Repository Impl → API / Local Storage
+                                      ↓
+                              Data Model → Mapper → Domain Entity
+                                      ↓
+                              BLoC emits State → View rebuilds
+```
+
+---
+
+## 🛠️ Tech Stack
+
+| Category | Library | Purpose |
+|----------|---------|---------|
+| **Framework** | Flutter 3.x | Cross-platform UI |
+| **State Management** | flutter_bloc | BLoC pattern |
+| **Dependency Injection** | get_it + injectable | Service locator & DI |
+| **Code Generation** | freezed + json_serializable | Immutable models & JSON |
+| **Networking** | dio | HTTP client |
+| **Navigation** | auto_route | Type-safe routing |
+| **Secure Storage** | flutter_secure_storage | JWT token storage |
+| **Image Carousel** | carousel_slider | Home banner slider |
+| **Image Picker** | image_picker | Avatar upload |
+| **Reactive Streams** | rxdart | Event transformers |
+| **Concurrency** | bloc_concurrency | BLoC event transformers |
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Flutter SDK `>=3.0.0`
+- Dart SDK `>=3.0.0`
+- FVM (Flutter Version Manager) — recommended
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/your-username/ui_farm_app.git
+cd ui_farm_app
+
+# Install dependencies
+flutter pub get
+
+# Run code generation
+dart run build_runner build --delete-conflicting-outputs
+
+# Run the app
+flutter run
+```
+
+### With FVM
+
+```bash
+fvm install
+fvm flutter pub get
+make build_all
+fvm flutter run
+```
+
+---
+
+## ⚙️ Environment
+
+| Key | Value |
+|-----|-------|
+| Base URL | `https://ui-farm-be-main-1.onrender.com/ui-farm` |
+| Auth | Bearer JWT Token |
+| Min Android SDK | 24 |
+| Min iOS | 15.0 |
+
+---
+
+## 📦 Key Patterns
+
+### BLoC Pattern
+Every screen has its own BLoC with `Event → State` flow:
+```dart
+// Dispatch event
+bloc.add(const LoginButtonPressed());
+
+// Listen to state
+BlocBuilder<LoginBloc, LoginState>(
+  buildWhen: (p, c) => p.isLoading != c.isLoading,
+  builder: (context, state) => ...,
+)
+```
+
+### Use Case Pattern
+```dart
+@injectable
+class LoginUseCase extends BaseFutureUseCase<LoginInput, LoginOutput> {
+  @override
+  Future<LoginOutput> buildUseCase(LoginInput input) async {
+    final user = await _authRepository.login(
+      email: input.email,
+      password: input.password,
+    );
+    return LoginOutput(user: user);
+  }
+}
+```
+
+### Repository Pattern
+```dart
+// Domain layer — abstract interface
+abstract class AuthRepository {
+  Future<User> login({required String email, required String password});
+}
+
+// Data layer — implementation
+@LazySingleton(as: AuthRepository)
+class AuthRepositoryImpl implements AuthRepository { ... }
+```
+
+---
+
+## 🗂️ API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/auth/login` | User login |
+| `POST` | `/users` | User register |
+| `GET` | `/users/me` | Get current user |
+| `PUT` | `/users/:id` | Update profile |
+| `GET` | `/items` | Get all items |
+| `GET` | `/items/filter/` | Filter items (color, gallery, price, page) |
+| `GET` | `/galleries` | Get all galleries/collections |
+| `GET` | `/cart/` | Get user cart |
+| `PATCH` | `/cart/remove` | Remove item from cart |
+| `PATCH` | `/cart/updateQuantity` | Update cart item quantity |
+| `GET` | `/payment` | Get order history |
+
+---
+
+## 📄 License
+
+This project is for personal/portfolio purposes.
+
+---
+
+<p align="center">Made with ❤️ in Ho Chi Minh City 🇻🇳</p>
