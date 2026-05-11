@@ -10,9 +10,9 @@
 |---|---|---|
 | <img width="300" height="600" alt="Screenshot_1778423334" src="https://github.com/user-attachments/assets/edd64282-e519-4d77-af5a-d0e01c1782ec" /> | <img width="300" height="600" alt="Screenshot_1778423454" src="https://github.com/user-attachments/assets/7a9ee9e9-eef8-43c5-b741-fa5b50ab4e9f" /> | <img width="300" height="600" alt="Screenshot_1778423532" src="https://github.com/user-attachments/assets/b7148d0a-e2cd-405b-9832-4c183bddb58a" />  <img width="300" height="600" alt="Screenshot_1778423515" src="https://github.com/user-attachments/assets/d6e5159f-0280-4e9f-881d-972f652ce305" /> |
 
-| Product List | Product Detail | Cart |
-|---|---|---|
-| <img width="300" height="600" alt="Screenshot_1778424199" src="https://github.com/user-attachments/assets/873c3a2d-51ad-43fb-8edf-b98c1c624c9a" /> | _paste screenshot_ | <img width="300" height="600" alt="Screenshot_1778424118" src="https://github.com/user-attachments/assets/4d4505e1-b1d8-474e-92a7-78fe17ca00e6" /> |
+| Product List | Cart |
+|---|---|
+| <img width="300" height="600" alt="Screenshot_1778424199" src="https://github.com/user-attachments/assets/873c3a2d-51ad-43fb-8edf-b98c1c624c9a" /> |  <img width="300" height="600" alt="Screenshot_1778424118" src="https://github.com/user-attachments/assets/4d4505e1-b1d8-474e-92a7-78fe17ca00e6" /> |
 
 | Order Management | Profile | Contact |
 |---|---|---|
