@@ -1,8 +1,9 @@
-import 'package:auto_route/auto_route.dart';
+﻿import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ui_farm/di/injection.dart';
 import 'package:ui_farm/domain/domain.dart';
+import 'package:ui_farm/shared/shared.dart';
 import 'package:ui_farm/ui/ui.dart';
 
 @RoutePage()
@@ -99,7 +100,6 @@ class _ListItemViewState extends BasePageState<ListItemView, ListItemBloc> {
                 },
               ),
 
-              // Load more indicator
               BlocBuilder<ListItemBloc, ListItemState>(
                 buildWhen: (p, c) =>
                     p.isLoadingMore != c.isLoadingMore || p.hasReachedMax != c.hasReachedMax,
@@ -144,7 +144,6 @@ class _ListItemViewState extends BasePageState<ListItemView, ListItemBloc> {
     final minPriceCtrl = TextEditingController(text: state.minPrice?.toString() ?? '');
     final maxPriceCtrl = TextEditingController(text: state.maxPrice?.toString() ?? '');
 
-    // lấy tất cả màu từ AppBloc items (đầy đủ hơn là từ filtered items)
     final colors = getIt<AppBloc>().state.items.expand((item) => item.color).toSet().toList()
       ..sort();
 
@@ -154,7 +153,6 @@ class _ListItemViewState extends BasePageState<ListItemView, ListItemBloc> {
           builder: (context, setDrawerState) {
             return Column(
               children: [
-                // Header
                 Padding(
                   padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
                   child: Row(
@@ -175,36 +173,35 @@ class _ListItemViewState extends BasePageState<ListItemView, ListItemBloc> {
                   child: ListView(
                     padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
                     children: [
-                      // Gallery
                       const _FilterSectionTitle('Bộ sưu tập'),
-                      // Option "Tất cả"
-                      RadioListTile<String?>(
-                        contentPadding: EdgeInsets.zero,
-                        title: const Text('Tất cả'),
-                        value: null,
+                      RadioGroup<String?>(
                         groupValue: tempGalleryName,
-                        activeColor: Colors.brown,
-                        onChanged: (_) => setDrawerState(() => tempGalleryName = null),
-                      ),
-                      ...state.galleries.map(
-                        (gallery) => RadioListTile<String?>(
-                          contentPadding: EdgeInsets.zero,
-                          title: Text(gallery.name),
-                          value: gallery.name,
-                          groupValue: tempGalleryName,
-                          activeColor: Colors.brown,
-                          onChanged: (value) => setDrawerState(() => tempGalleryName = value),
+                        onChanged: (value) => setDrawerState(() => tempGalleryName = value),
+                        child: Column(
+                          children: [
+                            const RadioListTile<String?>(
+                              contentPadding: EdgeInsets.zero,
+                              title: Text('Tất cả'),
+                              value: null,
+                              fillColor: WidgetStatePropertyAll(Colors.brown),
+                            ),
+                            ...state.galleries.map(
+                              (gallery) => RadioListTile<String?>(
+                                contentPadding: EdgeInsets.zero,
+                                title: Text(gallery.name),
+                                value: gallery.name,
+                                fillColor: const WidgetStatePropertyAll(Colors.brown),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                       const _FilterDivider(),
-
-                      // Color
                       const _FilterSectionTitle('Màu sắc'),
                       Wrap(
                         spacing: 8,
                         runSpacing: 8,
                         children: [
-                          // Option "Tất cả màu"
                           GestureDetector(
                             onTap: () => setDrawerState(() => tempColor = null),
                             child: Container(
@@ -252,8 +249,6 @@ class _ListItemViewState extends BasePageState<ListItemView, ListItemBloc> {
                         ],
                       ),
                       const _FilterDivider(),
-
-                      // Price
                       const _FilterSectionTitle('Khoảng giá'),
                       Row(
                         children: [
@@ -287,8 +282,6 @@ class _ListItemViewState extends BasePageState<ListItemView, ListItemBloc> {
                     ],
                   ),
                 ),
-
-                // Buttons
                 Padding(
                   padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
                   child: Row(
@@ -347,20 +340,21 @@ class _FilterBar extends StatelessWidget {
     required this.onTapAll,
     required this.galleries,
     required this.onTapGallery,
-    required this.selectedGalleryName, // 👈 đổi từ selectedGalleryId
+    required this.selectedGalleryName,
   });
 
   final VoidCallback onTapAll;
   final List<Gallery> galleries;
   final ValueChanged<Gallery> onTapGallery;
-  final String? selectedGalleryName; // 👈
+  final String? selectedGalleryName;
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ListItemBloc, ListItemState>(
-      buildWhen: (p, c) =>
-          p.hasActiveFilter != c.hasActiveFilter ||
-          p.selectedGalleryName != c.selectedGalleryName, // 👈
+      buildWhen: (p, c) {
+        return p.hasActiveFilter != c.hasActiveFilter ||
+            p.selectedGalleryName != c.selectedGalleryName;
+      },
       builder: (context, state) {
         return SizedBox(
           height: 40,
@@ -376,7 +370,7 @@ class _FilterBar extends StatelessWidget {
               ...galleries.map(
                 (gallery) => _FilterPill(
                   label: gallery.name,
-                  selected: selectedGalleryName == gallery.name, // 👈
+                  selected: selectedGalleryName == gallery.name,
                   onTap: () => onTapGallery(gallery),
                 ),
               ),
@@ -456,7 +450,6 @@ class _ItemCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image
             Expanded(
               child: ClipRRect(
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
@@ -471,7 +464,6 @@ class _ItemCard extends StatelessWidget {
               ),
             ),
 
-            // Info
             Padding(
               padding: const EdgeInsets.all(10),
               child: Column(
@@ -488,7 +480,6 @@ class _ItemCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  // Colors
                   Wrap(
                     spacing: 4,
                     children: item.color
@@ -507,7 +498,7 @@ class _ItemCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    _formatPrice(item.price),
+                    item.price.toFormattedPrice(),
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
@@ -528,10 +519,6 @@ class _ItemCard extends StatelessWidget {
       color: const Color(0xFFD4B896),
       child: const Icon(Icons.checkroom_rounded, color: Colors.white54, size: 40),
     );
-  }
-
-  String _formatPrice(int price) {
-    return '${price.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.')} đ';
   }
 
   Color _colorFromName(String name) {

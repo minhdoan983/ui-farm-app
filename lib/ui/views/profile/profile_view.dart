@@ -90,6 +90,7 @@ class _ProfileViewState extends BasePageState<ProfileView, ProfileBloc> {
                               if (state.pickedImage != null) {
                                 return Image.file(File(state.pickedImage!.path), fit: BoxFit.cover);
                               }
+
                               if (state.avatarUrl.isNotEmpty) {
                                 return Image.network(
                                   state.avatarUrl,
@@ -174,7 +175,7 @@ class _ProfileViewState extends BasePageState<ProfileView, ProfileBloc> {
                       prefixIcon: Icon(CupertinoIcons.phone),
                       border: InputBorder.none,
                     ),
-                    onChanged: (v) => bloc.add(ProfilePhoneTextFieldChanged(phone: v)),
+                    onChanged: (phone) => bloc.add(ProfilePhoneTextFieldChanged(phone: phone)),
                   ),
                 ),
                 const SizedBox(height: 30),

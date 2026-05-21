@@ -1,7 +1,8 @@
-import 'package:auto_route/auto_route.dart';
+﻿import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ui_farm/domain/domain.dart';
+import 'package:ui_farm/shared/shared.dart';
 import 'package:ui_farm/ui/ui.dart';
 
 @RoutePage()
@@ -166,7 +167,6 @@ class _OrderCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          // Header
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             child: Row(
@@ -231,7 +231,7 @@ class _OrderCard extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            _formatPrice(item.price * item.quantity),
+                            (item.price * item.quantity).toFormattedPrice(),
                             style: const TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
@@ -246,7 +246,6 @@ class _OrderCard extends StatelessWidget {
             ),
           ),
 
-          // Footer
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: const BoxDecoration(
@@ -262,7 +261,7 @@ class _OrderCard extends StatelessWidget {
                   style: TextStyle(fontSize: 11, color: Color(0xFFA07850)),
                 ),
                 Text(
-                  _formatPrice(order.totalPrice),
+                  order.totalPrice.toFormattedPrice(),
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -287,10 +286,6 @@ class _OrderCard extends StatelessWidget {
       ),
       child: const Icon(Icons.checkroom_rounded, color: Colors.white54, size: 20),
     );
-  }
-
-  String _formatPrice(int price) {
-    return '${price.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.')} đ';
   }
 }
 

@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ui_farm/domain/domain.dart';
+import 'package:ui_farm/shared/shared.dart';
 import 'package:ui_farm/ui/ui.dart';
 
 @RoutePage()
@@ -219,7 +220,7 @@ class _CartItem extends StatelessWidget {
                         onDecrease: onDecrease,
                       ),
                       Text(
-                        _formatPrice(item.price * item.quantity),
+                        (item.price * item.quantity).toFormattedPrice(),
                         style: const TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w500,
@@ -269,10 +270,6 @@ class _CartItem extends StatelessWidget {
       color: const Color(0xFFD4B896),
       child: const Icon(Icons.checkroom_rounded, color: Colors.white54, size: 32),
     );
-  }
-
-  String _formatPrice(int price) {
-    return '${price.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.')} đ';
   }
 }
 
@@ -369,21 +366,21 @@ class _SummaryCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          _SummaryRow(label: 'Tạm tính', value: _formatPrice(totalPrice)),
+          _SummaryRow(label: 'Tạm tính', value: totalPrice.toFormattedPrice()),
           const _SummaryRow(label: 'Phí may đo', value: 'Miễn phí'),
           const _SummaryRow(label: 'Giao hàng', value: '50.000 đ'),
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 8),
             child: Divider(color: Color(0xFFEAD8C8)),
           ),
-          _SummaryRow(label: 'Tổng cộng', value: _formatPrice(totalPrice + 50000), isTotal: true),
+          _SummaryRow(
+            label: 'Tổng cộng',
+            value: (totalPrice + 50000).toFormattedPrice(),
+            isTotal: true,
+          ),
         ],
       ),
     );
-  }
-
-  String _formatPrice(int price) {
-    return '${price.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.')} đ';
   }
 }
 

@@ -26,7 +26,6 @@ class ProfileBloc extends BaseBloc<ProfileEvent, ProfileState> {
   final UpdateProfileUseCase _updateProfileUseCase;
 
   FutureOr<void> _onViewInitiated(ProfileViewInitiated event, Emitter<ProfileState> emit) {
-    // lấy user từ AppBloc
     final user = getIt<AppBloc>().state.user;
     emit(
       state.copyWith(

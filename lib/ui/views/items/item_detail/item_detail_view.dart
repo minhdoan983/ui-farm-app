@@ -59,8 +59,6 @@ class _ItemDetailViewState extends State<ItemDetailView> {
                       ),
                     ],
                   ),
-
-                  // Thumbnails
                   Container(
                     color: Colors.white,
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -94,8 +92,6 @@ class _ItemDetailViewState extends State<ItemDetailView> {
                       ),
                     ),
                   ),
-
-                  // Info
                   Padding(
                     padding: const EdgeInsets.all(14),
                     child: Column(
@@ -133,8 +129,6 @@ class _ItemDetailViewState extends State<ItemDetailView> {
                           ],
                         ),
                         const SizedBox(height: 20),
-
-                        // Colors
                         const Text(
                           'MÀU SẮC',
                           style: TextStyle(
@@ -177,8 +171,6 @@ class _ItemDetailViewState extends State<ItemDetailView> {
                           ),
                         ),
                         const SizedBox(height: 20),
-
-                        // Materials
                         const Text(
                           'CHẤT LIỆU',
                           style: TextStyle(
@@ -220,8 +212,6 @@ class _ItemDetailViewState extends State<ItemDetailView> {
                           ),
                         ),
                         const SizedBox(height: 20),
-
-                        // Quantity
                         Row(
                           children: [
                             const Text(
@@ -289,8 +279,6 @@ class _ItemDetailViewState extends State<ItemDetailView> {
               ),
             ),
           ),
-
-          // Bottom actions
           Padding(
             padding: const EdgeInsets.fromLTRB(14, 8, 14, 24),
             child: Row(

@@ -50,17 +50,14 @@ class _HomeViewState extends State<HomeView> {
           }
 
           final items = state.items;
-          // lấy ảnh đầu tiên của từng item cho carousel
           final carouselImages = items
               .where((e) => e.imgUrl.isNotEmpty)
               .take(5)
               .map((e) => e.imgUrl.first)
               .toList();
 
-          // featured = 2 item đầu
           final featuredItems = items.take(2).toList();
 
-          // horizontal list = 5 item tiếp theo
           final horizontalItems = items.skip(2).take(5).toList();
 
           return SingleChildScrollView(
@@ -69,7 +66,6 @@ class _HomeViewState extends State<HomeView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Banner
                 Container(
                   width: double.infinity,
                   margin: const EdgeInsets.only(bottom: 16),
@@ -87,7 +83,6 @@ class _HomeViewState extends State<HomeView> {
                   ),
                 ),
 
-                // Search
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: TextField(
@@ -111,7 +106,6 @@ class _HomeViewState extends State<HomeView> {
                 ),
                 const SizedBox(height: 36),
 
-                // Carousel từ API
                 if (carouselImages.isNotEmpty)
                   CarouselSlider(
                     items: carouselImages.map((url) {
@@ -228,7 +222,6 @@ class _HomeViewState extends State<HomeView> {
                   ),
                 ),
 
-                // Horizontal list title
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                   child: Text(
@@ -241,7 +234,6 @@ class _HomeViewState extends State<HomeView> {
                   ),
                 ),
 
-                // Horizontal items từ API
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10).copyWith(bottom: 10),
                   child: RawScrollbar(

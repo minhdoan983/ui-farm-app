@@ -14,9 +14,9 @@ class _ItemManagementViewState extends State<ItemManagementView> {
   int _selectedColorIndex = 0;
   String? _selectedMaterial;
   String? _selectedGallery;
-  final _nameCtrl = TextEditingController();
-  final _priceCtrl = TextEditingController();
-  final _galleryCtrl = TextEditingController();
+  final _nameController = TextEditingController();
+  final _priceController = TextEditingController();
+  final _galleryController = TextEditingController();
 
   final _colors = [Colors.red, Colors.black, Colors.white, Colors.brown, Colors.green];
   final _materials = ['Linen bột', 'Lụa tơ', 'Đũi thô', 'Tuyết mai'];
@@ -24,9 +24,9 @@ class _ItemManagementViewState extends State<ItemManagementView> {
 
   @override
   void dispose() {
-    _nameCtrl.dispose();
-    _priceCtrl.dispose();
-    _galleryCtrl.dispose();
+    _nameController.dispose();
+    _priceController.dispose();
+    _galleryController.dispose();
     super.dispose();
   }
 
@@ -87,17 +87,16 @@ class _ItemManagementViewState extends State<ItemManagementView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildField('TÊN SẢN PHẨM', controller: _nameCtrl, hint: 'Nhập tên áo dài...'),
+            _buildField('TÊN SẢN PHẨM', controller: _nameController, hint: 'Nhập tên áo dài...'),
             const SizedBox(height: 12),
             _buildField(
               'GIÁ BÁN',
-              controller: _priceCtrl,
+              controller: _priceController,
               hint: '0 đ',
               keyboardType: TextInputType.number,
             ),
             const SizedBox(height: 12),
 
-            // Colors
             const Text(
               'MÀU SẮC',
               style: TextStyle(fontSize: 11, color: Color(0xFFA07850), letterSpacing: 0.4),
@@ -153,8 +152,6 @@ class _ItemManagementViewState extends State<ItemManagementView> {
               ),
             ),
             const SizedBox(height: 12),
-
-            // Material dropdown
             const Text(
               'CHẤT LIỆU',
               style: TextStyle(fontSize: 11, color: Color(0xFFA07850), letterSpacing: 0.4),
@@ -194,8 +191,6 @@ class _ItemManagementViewState extends State<ItemManagementView> {
             const SizedBox(height: 16),
             const Divider(color: Color(0xFFEAD8C8)),
             const SizedBox(height: 12),
-
-            // Images
             const Row(
               children: [
                 Icon(Icons.photo_outlined, size: 16, color: Colors.brown),
@@ -329,7 +324,11 @@ class _ItemManagementViewState extends State<ItemManagementView> {
               ],
             ),
             const SizedBox(height: 10),
-            _buildField('TẠO THƯ VIỆN MỚI', controller: _galleryCtrl, hint: 'Tên thư viện...'),
+            _buildField(
+              'TẠO THƯ VIỆN MỚI',
+              controller: _galleryController,
+              hint: 'Tên thư viện...',
+            ),
             const SizedBox(height: 10),
             SizedBox(
               width: double.infinity,

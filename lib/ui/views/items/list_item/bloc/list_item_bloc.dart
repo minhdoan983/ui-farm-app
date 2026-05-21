@@ -28,7 +28,6 @@ class ListItemBloc extends BaseBloc<ListItemEvent, ListItemState> {
       doOnSubscribe: () async => emit(state.copyWith(isLoading: true)),
       doOnSuccessOrError: () async => emit(state.copyWith(isLoading: false)),
       action: () async {
-        // fetch galleries + items song song
         final results = await Future.wait([
           _getGalleriesUseCase.execute(const GetGalleriesInput()),
           _getFilteredItemsUseCase.execute(const GetFilteredItemsInput()),
